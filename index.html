@@ -705,6 +705,23 @@
     position: absolute; font-family: var(--font-head); font-size: 9px; font-weight: 800;
     letter-spacing: -.02em; line-height: 1; text-align: center; pointer-events: none;
   }
+  .diff-rings-row {
+    display: flex; gap: 6px; padding: 8px 14px 6px;
+    border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .diff-ring-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: default;
+  }
+  .diff-ring-item .dri-label {
+    font-family: var(--font-head); font-size: 9px; letter-spacing: .06em;
+  }
+  .diff-ring-item .dri-pct {
+    font-family: var(--font-mono); font-size: 8px; color: var(--text-dim);
+  }
+  .player-avg-rank {
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
+    letter-spacing: .04em; margin-top: 1px;
+  }
 
   /* ─── Head-to-Head Common ───────────────────────────────────── */
   .h2h-header {
@@ -722,14 +739,14 @@
   .h2h-row:hover { background: rgba(255,255,255,.04) !important; }
   .h2h-idx { width: 22px; text-align: right; font-size: 11px; color: var(--muted); flex-shrink: 0; }
   .h2h-name { flex: 1; font-size: 13px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .h2h-cells { display: flex; gap: 0; flex-shrink: 0; }
+  .h2h-cells { display: flex; gap: 0; flex-shrink: 0; overflow-x: auto; max-width: 600px; }
   .h2h-player-col {
-    width: 90px; text-align: center; font-family: var(--font-head); font-size: 11px;
+    min-width: 70px; width: 90px; text-align: center; font-family: var(--font-head); font-size: 11px;
     font-weight: 700; letter-spacing: .06em; padding: 2px 6px; white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis;
+    overflow: hidden; text-overflow: ellipsis; flex-shrink: 0;
   }
   .h2h-cell {
-    width: 90px; display: flex; flex-direction: column; align-items: center;
+    min-width: 70px; width: 90px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center;
     justify-content: center; gap: 1px; padding: 3px 4px;
     border: 1px solid transparent; transition: background .15s;
   }
@@ -1508,25 +1525,32 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
   let skillDiffNum = 0;
   let skillPct = 0;
   if(window._diffTotalsLoaded && Object.keys(window._diffTotals).length > 0){
-    // Count player's finished maps per difficulty
     const playerDiffCounts = {};
     base.maps.forEach(m => {
       if(m.difficulty > 0) playerDiffCounts[m.difficulty] = (playerDiffCounts[m.difficulty]||0) + 1;
     });
-    // Walk from hardest to easiest (skip Mod=7), find highest where ≥50%
     for(let d = 6; d >= 1; d--){
       const total = window._diffTotals[d] || 0;
       const finished = playerDiffCounts[d] || 0;
       if(total > 0 && (finished / total) >= 0.5){
-        skillDiffNum = d;
-        skillPct = ((finished / total) * 100).toFixed(0);
-        break;
+        skillDiffNum = d; skillPct = ((finished / total) * 100).toFixed(0); break;
       }
     }
-    const SHORT = ['','Sol','Easy','Main','Hard','Ins','Ext','Mod'];
+    // Fallback: if no diff hits ≥50%, use highest diff player has any maps in
+    if(!skillDiffNum){
+      for(let d = 6; d >= 1; d--){
+        if(playerDiffCounts[d] > 0){ skillDiffNum = d; skillPct = 0; break; }
+      }
+    }
+    const SHORT = ['','Sol','Easy','Main','Hard','Ins','Ext'];
     skillLabel = skillDiffNum > 0 ? SHORT[skillDiffNum] : '—';
-  } else {
-    skillLabel = '…';
+  } else if(!window._diffTotalsLoaded){
+    // While loading: show best guess from player's own maps
+    const SHORT = ['','Sol','Easy','Main','Hard','Ins','Ext'];
+    for(let d = 6; d >= 1; d--){
+      if(base.maps.some(m => m.difficulty === d)){ skillDiffNum = d; skillLabel = SHORT[d]; break; }
+    }
+    if(!skillDiffNum) skillLabel = '…';
   }
   const skillColor = skillDiffNum > 0 ? ['','#4ade80','#2dd4bf','#fde047','#fb923c','#f87171','#ef4444','#a78bfa'][skillDiffNum] : color;
   const skillSparkPct = skillDiffNum > 0 ? Math.min(((skillDiffNum/7)*100),100).toFixed(1) : 0;
@@ -1546,14 +1570,15 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
 
   // Top5 stat display
   const top5StatVal = isFiltered
-    ? `${top5InDiff}<span style="font-size:17px;opacity:.5"> / ${shownCount}</span>`
+    ? String(top5InDiff)
     : String(top5Count);
   const top5Label = isFiltered ? `${DIFF_LABEL_ORDER[parseInt(_activeDiff)]||'?'} TOP5` : 'TOP 5';
   const top5Pct = shownCount > 0 ? ((top5InDiff / shownCount)*100).toFixed(1) : '0';
   const top5SparkPct = shownCount > 0 ? ((top5InDiff / shownCount)*100).toFixed(1) : 0;
 
-  const r1Pill = base.rank1Count > 0
-    ? `<span class="rank-1-badge">★ ${base.rank1Count} #1</span>`
+  const r1PillCount = isFiltered ? data.maps.filter(m => m.rank === 1).length : base.rank1Count;
+  const r1Pill = r1PillCount > 0
+    ? `<span class="rank-1-badge">★ ${r1PillCount} #1</span>`
     : '';
 
   let mapsHtml = '';
@@ -1581,28 +1606,48 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
     ? `${DIFF_LABEL_ORDER[parseInt(_activeDiff)]||'?'} MAPS — <strong style="color:#fff">${shownCount}</strong> <span style="color:var(--text-dim)">/ ${totalInDiff}</span>`
     : `ALL MAPS — ${totalCount}`;
 
-  // Completion ring
-  let serverTotal = 0;
-  if(window._diffTotalsLoaded){
-    serverTotal = Object.values(window._diffTotals).reduce((a,b)=>a+b,0);
+  // Completion ring — shows overall OR selected diff progress
+  let serverTotal = 0, ringFinished = 0;
+  const safeDiffTotals = window._diffTotals || {};
+  if(isFiltered){
+    const diffNum = parseInt(_activeDiff);
+    serverTotal  = safeDiffTotals[diffNum] || 0;
+    ringFinished = base.maps.filter(m => m.difficulty === diffNum).length;
+  } else {
+    if(window._diffTotalsLoaded){
+      serverTotal = Object.values(safeDiffTotals).reduce((a,b)=>a+b,0);
+    }
+    ringFinished = base.totalMaps;
   }
-  const ringPct = serverTotal > 0 ? Math.min((base.totalMaps / serverTotal) * 100, 100) : 0;
+  const ringPct   = serverTotal > 0 ? Math.min((ringFinished / serverTotal) * 100, 100) : 0;
   const ringR = 20, ringC = 24;
-  const ringCirc = 2 * Math.PI * ringR;
-  const ringDash = (ringPct / 100) * ringCirc;
-  const ringGap  = ringCirc - ringDash;
+  const ringCirc  = 2 * Math.PI * ringR;
+  const ringDash  = (ringPct / 100) * ringCirc;
+  const ringGap   = ringCirc - ringDash;
+  const ringColor = isFiltered
+    ? (['','#4ade80','#2dd4bf','#fde047','#fb923c','#f87171','#ef4444'][parseInt(_activeDiff)] || color)
+    : color;
   const ringLabel = serverTotal > 0 ? ringPct.toFixed(1) + '%' : '…';
+  const ringTitle = isFiltered
+    ? `${DIFF_LABEL_ORDER[parseInt(_activeDiff)]||'?'} completion: ${ringFinished}/${serverTotal}`
+    : `Server completion: ${ringLabel}`;
   const completionRing = `
-    <div class="completion-ring" title="Server completion: ${ringLabel}">
+    <div class="completion-ring" title="${ringTitle}">
       <svg width="${ringC*2}" height="${ringC*2}" viewBox="0 0 ${ringC*2} ${ringC*2}" style="transform:rotate(-90deg)">
         <circle cx="${ringC}" cy="${ringC}" r="${ringR}" fill="none" stroke="var(--border2)" stroke-width="3"/>
-        <circle cx="${ringC}" cy="${ringC}" r="${ringR}" fill="none" stroke="${color}" stroke-width="3"
+        <circle cx="${ringC}" cy="${ringC}" r="${ringR}" fill="none" stroke="${ringColor}" stroke-width="3"
           stroke-dasharray="${ringDash.toFixed(2)} ${ringGap.toFixed(2)}"
           stroke-linecap="round"
-          style="filter:drop-shadow(0 0 4px ${color});transition:stroke-dasharray 1s cubic-bezier(.16,1,.3,1)"/>
+          style="filter:drop-shadow(0 0 4px ${ringColor});transition:stroke-dasharray 1s cubic-bezier(.16,1,.3,1)"/>
       </svg>
-      <span class="ring-label" style="color:${color}">${ringLabel}</span>
+      <span class="ring-label" style="color:${ringColor}">${ringLabel}</span>
     </div>`;
+
+  // AVG RANK across current visible maps
+  const rankedMaps = data.maps.filter(m => m.rank > 0);
+  const avgRank = rankedMaps.length > 0
+    ? (rankedMaps.reduce((s, m) => s + m.rank, 0) / rankedMaps.length).toFixed(1)
+    : null;
 
   const searchInputId = `mapSearch-${idx}`;
 
@@ -1612,6 +1657,7 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
       <div class="player-name-wrap">
         <div class="player-label">PLAYER ${idx < 10 ? '0'+idx : idx}</div>
         <div class="player-name">${esc(data.name)}</div>
+        ${avgRank ? `<div class="player-avg-rank">avg rank <span style="color:${color}">#${avgRank}</span></div>` : ''}
       </div>
       ${r1Pill}
       ${completionRing}
@@ -1674,11 +1720,12 @@ function togglePlayerUnfin(cardId, header){
   if(arrow) arrow.textContent = open ? '▼ SHOW' : '▲ HIDE';
 }
 
-function buildChart(playerData){
+function buildChart(playerData, fullPlayerData){
+  const fullData = fullPlayerData || playerData;
   const maxMaps  = Math.max(...playerData.map(d => d.totalMaps), 1);
   const maxRank1 = Math.max(...playerData.map(d => d.rank1Count), 1);
 
-  // Compute skill level num (1-6, no Mod) per player for chart
+  // Skill level always uses FULL (unfiltered) maps
   function getSkillNum(d){
     if(!window._diffTotalsLoaded) return 0;
     const playerDiffCounts = {};
@@ -1688,6 +1735,7 @@ function buildChart(playerData){
       const finished = playerDiffCounts[diff] || 0;
       if(total > 0 && (finished / total) >= 0.5) return diff;
     }
+    for(let diff = 6; diff >= 1; diff--){ if(playerDiffCounts[diff] > 0) return diff; }
     return 0;
   }
 
@@ -1708,8 +1756,8 @@ function buildChart(playerData){
   const SHORT = ['','Sol','Easy','Main','Hard','Ins','Ext'];
   const DIFF_COLORS_ARR = ['','#4ade80','#2dd4bf','#fde047','#fb923c','#f87171','#ef4444'];
 
-  // Skill level rows use diff color instead of player color
-  const skillRows = playerData.map(d => {
+  // Skill level rows — always from FULL unfiltered data, colored by diff
+  const skillRows = fullData.map(d => {
     const sn = getSkillNum(d);
     const pct = sn > 0 ? ((sn / 6) * 100).toFixed(1) : 0;
     const sc = sn > 0 ? DIFF_COLORS_ARR[sn] : 'var(--border2)';
@@ -1764,13 +1812,28 @@ function buildCommonPanel(common, playerData){
     });
   }
 
-  // Header columns per player
-  const playerCols = playerData ? playerData.map(d =>
-    `<div class="h2h-player-col" style="color:${d.color};border-bottom:2px solid ${d.color}33">
-      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${d.color};margin-right:4px;vertical-align:middle"></span>
-      ${esc(d.name.length > 8 ? d.name.slice(0,7)+'…' : d.name)}
-    </div>`
-  ).join('') : '';
+  // Compute avg rank per player across all common maps
+  const avgRanks = (playerData && playerData.length) ? playerData.map((d, pi) => {
+    const ranks = common.map(m => lookup[m.name.toLowerCase()]?.[pi]?.rank).filter(r => r > 0);
+    return ranks.length > 0 ? ranks.reduce((a,b) => a+b, 0) / ranks.length : Infinity;
+  }) : [];
+  const bestAvgRank = avgRanks.length ? Math.min(...avgRanks.filter(r => r !== Infinity)) : Infinity;
+
+  // Header columns per player — with avg rank + crown
+  const playerCols = playerData ? playerData.map((d, pi) => {
+    const avg = avgRanks[pi];
+    const avgStr = avg !== Infinity ? '#' + avg.toFixed(1) : '—';
+    const isBestAvg = avg === bestAvgRank && nPlayers > 1;
+    const crown = isBestAvg ? `<span class="h2h-crown" style="color:${d.color};font-size:13px">👑</span>` : '';
+    return `<div class="h2h-player-col" style="color:${d.color};border-bottom:2px solid ${d.color}33;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 6px">
+      <div style="display:flex;align-items:center;gap:3px">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${d.color};vertical-align:middle"></span>
+        ${esc(d.name.length > 8 ? d.name.slice(0,7)+'…' : d.name)}
+        ${crown}
+      </div>
+      <div style="font-size:10px;color:${isBestAvg ? d.color : 'var(--text-dim)'};font-family:var(--font-mono);letter-spacing:.04em;${isBestAvg ? `text-shadow:0 0 6px ${d.color}88` : ''}">avg ${avgStr}</div>
+    </div>`;
+  }).join('') : '';
 
   let rows = '';
   sorted.forEach((m, i) => {
@@ -2093,6 +2156,7 @@ function applySort(maps, pidx){
    Render All
 ═══════════════════════════════════════════════════════ */
 function renderAll({ playerData, common, exclusives, neitherMaps }){
+  try {
   const maxMaps = Math.max(...playerData.map(d => d.maps.length), 1);
 
   // Overview: all player cards in grid
@@ -2108,7 +2172,8 @@ function renderAll({ playerData, common, exclusives, neitherMaps }){
   });
 
   // Chart
-  document.getElementById('chartPanel').innerHTML = buildChart(playerData);
+  const filteredForChart = playerData.map(d => ({ ...d, maps: filterMaps(d.maps) }));
+  document.getElementById('chartPanel').innerHTML = buildChart(filteredForChart, playerData);
 
   // Per-player full tabs
   playerData.forEach((d, i) => {
@@ -2178,6 +2243,10 @@ function renderAll({ playerData, common, exclusives, neitherMaps }){
     });
   });
   updateTabIndicator();
+  } catch(err){
+    console.error('renderAll error:', err);
+    showStatus('Render error: ' + err.message + ' — ' + (err.stack||'').split('\n')[1], true);
+  }
 }
 
 
@@ -2444,25 +2513,32 @@ async function startCompare(){
   window._rawHtmls = [];
 
   try {
-    showStatus(`🔍 Fetching data for ${_tagPlayers.length} players…`);
-    const results = await Promise.all(
+    showStatus(`Fetching data for ${_tagPlayers.length} players…`);
+    const settled = await Promise.allSettled(
       _tagPlayers.map(p => fetchPlayerAPI(p.name, () => {}))
     );
 
-    window._rawHtmls = results.map(r => r.json ? JSON.stringify(r.json, null, 2) : (r.html || ''));
+    window._rawHtmls = settled.map(s => s.status === 'fulfilled' ? (s.value.json ? JSON.stringify(s.value.json,null,2) : (s.value.html||'')) : '');
 
     const playerData = [];
+    const failed = [];
     for(let i = 0; i < _tagPlayers.length; i++){
-      const r = results[i];
+      const s = settled[i];
       const name = _tagPlayers[i].name;
+      if(s.status === 'rejected'){ failed.push(name); continue; }
       try {
+        const r = s.value;
         const d = r.json ? parseAPIResponse(r.json, name) : parsePlayerHTML(r.html || '', name);
         d.color = _tagPlayers[i].color;
         d.unfinishedArr = r.unfinishedArr || [];
         playerData.push(d);
       } catch(e){
-        throw new Error(e.message === '404' ? `Player "${name}" not found` : `Could not parse data for "${name}"`);
+        failed.push(name + (e.message === '404' ? ' (not found)' : ''));
       }
+    }
+
+    if(playerData.length < 2){
+      throw new Error(`Not enough valid players. Failed: ${failed.join(', ')}`);
     }
 
     hideStatus();
@@ -2500,11 +2576,13 @@ async function startCompare(){
     renderAll(result);
     showResults(true);
     loadDiffTotals();
+    savePlayersToURL(playerData);
 
     const zeroMaps = playerData.filter(d => d.maps.length === 0);
-    if(zeroMaps.length > 0){
-      showStatus(`⚠ Got 0 maps for ${zeroMaps.map(d => `"${d.name}"`).join(', ')}. Click 🔍 Debug to inspect.`, true);
-    }
+    const warnParts = [];
+    if(failed.length) warnParts.push(`Could not load: ${failed.join(', ')}`);
+    if(zeroMaps.length) warnParts.push(`0 maps: ${zeroMaps.map(d=>d.name).join(', ')}`);
+    if(warnParts.length) showStatus(warnParts.join(' | '), true);
 
   } catch(err){
     showStatus(err.message || t('errNetwork'), true);
@@ -2518,6 +2596,25 @@ async function startCompare(){
    Initial translation pass
 ═══════════════════════════════════════════════════════ */
 setLang('en');
+
+// Save players to URL after compare
+function savePlayersToURL(playerData){
+  const names = playerData.map(d => d.name).join(',');
+  const url = new URL(location.href);
+  url.searchParams.set('players', names);
+  history.replaceState(null, '', url.toString());
+}
+
+// Load players from URL on page load
+(function loadPlayersFromURL(){
+  const url = new URL(location.href);
+  const p = url.searchParams.get('players');
+  if(!p) return;
+  const names = p.split(',').map(s => s.trim()).filter(Boolean);
+  names.forEach(n => { if(n) addTag(n); });
+  renderTags();
+  if(names.length >= 2) setTimeout(() => startCompare(), 200);
+})();
 
 /* ═══════════════════════════════════════════════════════
    Difficulty stats popup
