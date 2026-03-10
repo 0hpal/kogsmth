@@ -35,7 +35,6 @@
     --radius:    2px;
   }
 
-  /* ─── Reset & Base ──────────────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
@@ -49,7 +48,6 @@
   }
   body.ar { font-family: var(--font-arab); direction: rtl; }
 
-  /* ─── Animated grid background ─────────────────────────────── */
   body::before {
     content: '';
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -69,10 +67,8 @@
       radial-gradient(ellipse 50% 60% at 50% 50%,  rgba(167,139,250,.02) 0%, transparent 70%);
   }
 
-  /* ─── Layout ────────────────────────────────────────────────── */
   #app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 20px 20px 80px; }
 
-  /* ─── Header ────────────────────────────────────────────────── */
   header {
     text-align: center;
     padding: 48px 0 40px;
@@ -139,7 +135,6 @@
     background: var(--amber); color: #000; border-color: var(--amber);
   }
 
-  /* ─── Input Card ────────────────────────────────────────────── */
   .input-card {
     background: linear-gradient(160deg, var(--panel2) 0%, var(--panel) 100%);
     border: 1px solid var(--border2);
@@ -161,7 +156,6 @@
     background: radial-gradient(ellipse 80% 100% at 50% -20%, rgba(245,158,11,.06) 0%, transparent 70%);
   }
 
-  /* ─── Tag input ──────────────────────────────────────────────── */
   .tag-input-label {
     font-family: var(--font-head); font-size: 13px; font-weight: 700;
     letter-spacing: .22em; color: var(--amber); text-transform: uppercase;
@@ -235,7 +229,6 @@
   .compare-btn:active { transform: scale(.98); }
   .compare-btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
 
-  /* ─── Status / Error ────────────────────────────────────────── */
   #status {
     display: none;
     padding: 12px 18px;
@@ -250,7 +243,6 @@
   #status.error { border-color: var(--red); background: linear-gradient(90deg, var(--red-glow), transparent); color: var(--red); }
   #status.shown { display: block; }
 
-  /* ─── Loader ─────────────────────────────────────────────────── */
   .loader-wrap { text-align: center; padding: 70px 0; display: none; }
   .loader-wrap.shown { display: block; }
   .loader {
@@ -264,7 +256,6 @@
     box-shadow: 0 0 20px rgba(245,158,11,.15);
   }
 
-  /* ─── Keyframes ─────────────────────────────────────────────── */
   @keyframes spin    { to { transform: rotate(360deg); } }
   @keyframes fadeIn  { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
   @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
@@ -274,11 +265,9 @@
     100% { background-position: 200% center; }
   }
 
-  /* ─── Results ───────────────────────────────────────────────── */
   #results { display: none; animation: slideUp .4s cubic-bezier(.16,1,.3,1); }
   #results.shown { display: block; }
 
-  /* ─── Sticky results bar ────────────────────────────────────── */
   .results-sticky {
     position: sticky; top: 0; z-index: 20;
     background: rgba(5,8,12,.94);
@@ -290,7 +279,6 @@
     box-shadow: 0 6px 32px rgba(0,0,0,.7);
   }
 
-  /* ─── Filter Bar ────────────────────────────────────────────── */
   .filter-bar {
     display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
     padding: 10px 0 0;
@@ -320,7 +308,6 @@
   .filter-count { margin-left: auto; font-size: 12px; color: var(--text-dim); font-family: var(--font-mono); }
   .filter-count strong { color: var(--amber); font-size: 13px; }
 
-  /* ─── Tab Bar ───────────────────────────────────────────────── */
   .tab-bar-wrap {
     border-bottom: 1px solid var(--border2);
   }
@@ -329,12 +316,10 @@
     padding: 0; overflow-x: auto; scrollbar-width: none;
   }
   .tab-bar::-webkit-scrollbar { display: none; }
-  /* Static tabs row */
   .tab-bar-static {
     display: flex; gap: 0; padding: 0;
     border-bottom: 1px solid var(--border);
   }
-  /* Player tabs row — scrollable, smaller */
   .tab-bar-players {
     display: flex; gap: 0; overflow-x: auto; scrollbar-width: thin;
     scrollbar-color: var(--border2) transparent;
@@ -355,7 +340,6 @@
     --tab-color: var(--amber);
     position: relative;
   }
-  /* Player tab buttons are slightly smaller */
   .player-tab-btn {
     font-size: 12px; padding: 7px 12px;
   }
@@ -374,19 +358,16 @@
   }
   .tab-btn.active .tc { background: var(--tab-color, var(--amber)); color: #000; }
 
-  /* ─── Tab panes ─────────────────────────────────────────────── */
   .tab-pane        { display: none; padding-top: 18px; }
   .tab-pane.active { display: block; animation: fadeIn .2s ease; }
   .tab-card .maps-scroll { max-height: calc(100vh - 300px); }
 
-  /* ─── Players Grid (N players) ──────────────────────────────── */
   .players-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 14px; margin-bottom: 14px;
   }
 
-  /* ─── Player Card ───────────────────────────────────────────── */
   .player-card {
     background: var(--panel);
     border: 1px solid var(--border2);
@@ -402,7 +383,6 @@
     content:''; position:absolute; top:0; left:0; right:0; height:80px; pointer-events:none;
     background: linear-gradient(180deg, color-mix(in srgb, var(--pc, var(--amber)) 8%, transparent), transparent);
   }
-  /* subtle left glow bar */
   .player-card::after {
     content:''; position:absolute; left:0; top:0; bottom:0; width:2px; pointer-events:none;
     background: linear-gradient(180deg, var(--pc, var(--amber)), transparent 60%);
@@ -434,7 +414,6 @@
     letter-spacing: .04em;
   }
 
-  /* ─── Stats Row ─────────────────────────────────────────────── */
   .stats-row {
     display: grid; grid-template-columns: repeat(3, 1fr);
     border-bottom: 1px solid var(--border);
@@ -446,7 +425,6 @@
   }
   .stat-box:hover { background: color-mix(in srgb, var(--pc, var(--amber)) 4%, transparent); }
   .stat-box:last-child { border-right: none; }
-  /* top accent line per stat */
   .stat-box::before {
     content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px;
     background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--pc, var(--amber)) 50%, transparent), transparent);
@@ -463,7 +441,6 @@
   .stat-spark-fill { height: 100%; border-radius: 2px; transition: width 1.1s cubic-bezier(.16,1,.3,1); position: relative; }
   .stat-spark-fill::after { content:''; position:absolute; right:0; top:-2px; width:6px; height:7px; border-radius:50%; background:inherit; box-shadow:0 0 8px 2px currentColor; }
 
-  /* ─── Maps List ─────────────────────────────────────────────── */
   .maps-list-header {
     padding: 9px 12px; font-size: 11px; letter-spacing: .1em;
     color: var(--text-dim); text-transform: uppercase;
@@ -497,7 +474,6 @@
   .map-row:nth-child(even) { background: rgba(255,255,255,.012); }
   .map-row:hover { background: rgba(255,255,255,.04) !important; }
 
-  /* rank 1 special glow row */
   .map-row.is-rank1 {
     background: rgba(34,197,94,.05) !important;
     border-left: 2px solid rgba(34,197,94,.5);
@@ -527,7 +503,6 @@
   .diff-7 { background: rgba(167,139,250,.15); color: #a78bfa; }
   .diff-unknown { background: var(--bg3); color: var(--muted); }
 
-  /* ─── Rank badges ───────────────────────────────────────────── */
   .map-rank { font-size: 13px; width: 42px; flex-shrink: 0; text-align: right; font-family: var(--font-head); }
   .rank-1 {
     color: #22c55e; font-weight: 800;
@@ -539,11 +514,9 @@
   .rank-n { color: #3d5568; }
   .map-time { font-size: 12px; color: var(--text-dim); font-family: var(--font-mono); width: 90px; flex-shrink: 0; text-align: right; white-space: nowrap; letter-spacing: .01em; }
 
-  /* ─── Diff clickable ────────────────────────────────────────── */
   .map-diff.clickable { cursor: pointer; transition: filter .15s, opacity .15s; }
   .map-diff.clickable:hover { filter: brightness(1.35) saturate(1.2); opacity: .9; }
 
-  /* ─── Section Title ─────────────────────────────────────────── */
   .section-title {
     display: flex; align-items: center; gap: 10px;
     font-family: var(--font-head); font-size: 14px; font-weight: 700;
@@ -555,7 +528,6 @@
     background: linear-gradient(90deg, rgba(245,158,11,.3), transparent);
   }
 
-  /* ─── Compare Panels ────────────────────────────────────────── */
   .compare-panel {
     background: var(--panel); border: 1px solid var(--border2);
     border-top: 2px solid rgba(245,158,11,.4);
@@ -614,7 +586,6 @@
     background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.005) 10px, rgba(255,255,255,.005) 20px);
   }
 
-  /* ─── Chart / bars ──────────────────────────────────────────── */
   .chart-panel {
     background: var(--panel); border: 1px solid var(--border2);
     border-top: 1px solid rgba(245,158,11,.2);
@@ -643,7 +614,6 @@
     background: rgba(255,255,255,.3);
   }
 
-  /* ─── Rank-1 Badge ──────────────────────────────────────────── */
   .rank-1-badge {
     display: inline-flex; align-items: center; gap: 5px;
     background: linear-gradient(135deg, rgba(34,197,94,.2), rgba(34,197,94,.08));
@@ -660,17 +630,14 @@
     50%{ opacity:1 }
   }
 
-  /* ─── Live dot ──────────────────────────────────────────────── */
   .live-dot {
     width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
     animation: dotPulse 2s ease-in-out infinite;
   }
   @keyframes dotPulse { 0%,100%{ opacity:.7 } 50%{ opacity:1 } }
 
-  /* ─── Excl rank ─────────────────────────────────────────────── */
   .excl-rank { font-family: var(--font-head); font-size: 11px; font-weight: 700; width: 36px; flex-shrink: 0; text-align: right; margin-right: 4px; }
 
-  /* ─── Diff distribution bar ─────────────────────────────────── */
   .diff-dist-bar {
     display: flex; height: 5px; width: 100%; overflow: hidden;
     border-bottom: 1px solid var(--border);
@@ -681,14 +648,12 @@
   .dds-5 { background: #f87171; } .dds-6 { background: #ef4444; }
   .dds-7 { background: #a78bfa; }
 
-  /* ─── Scroll wrap ───────────────────────────────────────────── */
   .scroll-wrap { position: relative; }
   .scroll-wrap::after {
     content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40px; pointer-events: none;
     background: linear-gradient(transparent, rgba(15,24,37,.9));
   }
 
-  /* ─── Download button ───────────────────────────────────────── */
   .download-btn {
     display: inline-flex; align-items: center; gap: 7px;
     background: transparent; border: 1px solid var(--border2);
@@ -699,7 +664,6 @@
   .download-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
   .download-btn:hover { border-color: var(--amber); color: var(--amber); background: rgba(245,158,11,.06); box-shadow: 0 0 16px rgba(245,158,11,.1); }
 
-  /* ─── Completion Ring ───────────────────────────────────────── */
   .completion-ring {
     position: relative; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; width: 48px; height: 48px;
@@ -726,7 +690,6 @@
     letter-spacing: .04em; margin-top: 1px;
   }
 
-  /* ─── Head-to-Head Common ───────────────────────────────────── */
   .h2h-header {
     display: flex; align-items: center; gap: 6px;
     padding: 7px 14px; background: rgba(0,0,0,.25);
@@ -763,7 +726,6 @@
   }
   @keyframes crownPulse { 0%,100%{ opacity:.8; transform:scale(1) } 50%{ opacity:1; transform:scale(1.15) } }
 
-  /* ─── Exclusive Cards Grid ──────────────────────────────── */
   .excl-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -824,7 +786,6 @@
   footer a { color: var(--amber-dim); text-decoration: none; transition: color .2s; }
   footer a:hover { color: var(--amber); }
 
-  /* ─── Points Progression ─────────────────────────────────── */
   .pts-panel {
     background: var(--panel); border: 1px solid var(--border2);
     border-top: 2px solid rgba(253,224,71,.4);
@@ -871,23 +832,52 @@
     font-size: 9px; color: var(--text-dim); letter-spacing: .14em;
     text-transform: uppercase; margin-top: 6px;
   }
+
+  /* diff popup */
+  .diff-popup-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,.7);
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn .15s ease;
+    backdrop-filter: blur(4px);
+  }
+  .diff-popup {
+    background: var(--panel); border: 1px solid var(--border2);
+    border-top: 2px solid var(--amber);
+    padding: 28px 32px; max-width: 400px; width: 90%;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+  }
+  .diff-popup h3 {
+    font-family: var(--font-head); font-size: 18px; font-weight: 700;
+    color: var(--amber); letter-spacing: .1em; margin-bottom: 20px;
+  }
+  .popup-stat {
+    font-size: 15px; color: var(--text-dim); margin-bottom: 16px; line-height: 1.7;
+  }
+  .popup-stat strong { color: #fff; font-family: var(--font-head); }
+  .popup-pct { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--amber); margin: 8px 0 4px; text-shadow: 0 0 20px rgba(245,158,11,.4); }
+  .popup-bar-track { height: 8px; background: var(--border2); border-radius: 4px; overflow: hidden; }
+  .popup-bar-fill  { height: 100%; background: linear-gradient(90deg, var(--amber-dim), var(--amber)); border-radius: 4px; transition: width 1s cubic-bezier(.16,1,.3,1); box-shadow: 0 0 12px rgba(245,158,11,.4); }
+  .popup-close {
+    position: absolute; top: 12px; right: 14px;
+    background: transparent; border: none; color: var(--text-dim);
+    font-size: 18px; cursor: pointer; transition: color .15s;
+  }
+  .popup-close:hover { color: var(--amber); }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
 </head>
 <body>
 <div id="app">
 
-  <!-- ── Header ─────────────────────────── -->
   <header>
     <div class="header-badge">PLAYER INTEL</div>
     <h1>KoG<span>COMPARE</span></h1>
     <div class="header-sub">Head-to-Head Comparison System</div>
   </header>
 
-  <!-- ── Input Card ─────────────────────── -->
   <div class="input-card">
-    <div class="corner-tl"></div>
-    <div class="corner-br"></div>
     <div class="tag-input-label">PLAYERS — TYPE NAME THEN PRESS ENTER OR COMMA (2–8 PLAYERS)</div>
     <div class="tag-input-box" id="tagBox" onclick="document.getElementById('tagField').focus()">
       <input id="tagField" class="tag-input-field" type="text"
@@ -902,27 +892,16 @@
     <button class="compare-btn" id="compareBtn" onclick="startCompare()">COMPARE PLAYERS</button>
   </div>
 
-  <!-- ── Status / Error ─────────────────── -->
   <div id="status"></div>
 
-  <!-- ── Loader ─────────────────────────── -->
   <div class="loader-wrap" id="loader">
-    <div class="loader-radar">
-      <div class="loader-ring"></div>
-      <div class="loader-ring"></div>
-      <div class="loader-ring"></div>
-      <div class="loader-dot"></div>
-    </div>
+    <div class="loader"></div>
     <p style="margin-top:20px;font-size:14px;color:var(--text-dim);letter-spacing:.18em;" data-i18n="loading">FETCHING PLAYER DATA…</p>
   </div>
 
-  <!-- ── Results ────────────────────────── -->
   <div id="results">
 
-    <!-- Sticky top bar: filter + tabs -->
     <div class="results-sticky" id="resultsSticky">
-
-      <!-- Difficulty filter -->
       <div class="filter-bar" id="filterBar">
         <span class="filter-label">DIFF:</span>
         <button class="filter-btn active" data-diff="all"  onclick="setDiffFilter('all')">ALL</button>
@@ -936,7 +915,6 @@
         <span class="filter-count" id="filterCount"></span>
       </div>
 
-      <!-- Tab bar: static tabs on top, player tabs on second row -->
       <div class="tab-bar-wrap" id="tabBarWrap">
         <div class="tab-bar tab-bar-static" id="tabBarStatic">
           <button class="tab-btn active" data-tab="overview" onclick="setTab('overview')">Overview</button>
@@ -948,10 +926,8 @@
       </div>
     </div>
 
-    <!-- Tab panes (player panes injected dynamically) -->
     <div class="tab-pane active" id="tab-overview">
       <div class="players-grid" id="overviewGrid"></div>
-      <!-- Overview page switcher -->
       <div style="display:flex;align-items:center;gap:0;margin-top:14px;border-bottom:1px solid var(--border)">
         <button class="ov-page-btn active" id="ovPage1Btn" onclick="setOverviewPage(1)"
           style="background:transparent;border:none;border-bottom:2px solid var(--amber);
@@ -987,7 +963,6 @@
       <div class="compare-panel" id="neitherPanel" style="border-top-color:#ef4444;"></div>
     </div>
 
-    <!-- Bottom bar -->
     <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;padding-bottom:8px;">
       <button class="download-btn" onclick="downloadJSON()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/></svg>
@@ -1004,13 +979,11 @@
 
   </div>
 
-  <!-- ── Debug Panel ───────────────────────── -->
   <div id="debugSection" style="display:none;margin-top:20px;">
     <div class="section-title" style="color:var(--cyan)">🔍 HTML Debug Inspector</div>
     <div style="background:var(--panel);border:1px solid var(--border);border-top:2px solid var(--cyan);padding:16px;margin-bottom:12px;">
       <p style="font-size:15px;color:var(--text-dim);margin-bottom:12px;line-height:1.7;">
         Parser found: <strong style="color:var(--amber)" id="dbg-counts">—</strong>.
-        Inspect the raw HTML below to identify the correct selectors. Use the buttons to switch between players.
       </p>
       <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
         <button class="download-btn" onclick="showRaw(1)" style="border-color:var(--amber);color:var(--amber);" id="dbg-btn1">Player 1 Response</button>
@@ -1027,7 +1000,6 @@
     </div>
   </div>
 
-  <!-- ── Footer ────────────────────────────── -->
   <footer>
     <p>Unofficial tool. Data sourced from <a href="https://www.ravenkog.com" target="_blank">ravenkog.com</a></p>
     <p style="margin-top:8px;font-size:12px;color:var(--text-dim)">
@@ -1040,77 +1012,40 @@
     </p>
   </footer>
 
-</div><!-- #app -->
+</div>
 
 <script>
-/* ═══════════════════════════════════════════════════════
-   i18n
-═══════════════════════════════════════════════════════ */
 const i18n = {
   en: {
-    badge:          'PLAYER INTEL',
-    tagline:        'Head-to-Head Comparison System',
-    player1:        'Player 1',
-    player2:        'Player 2',
-    compare:        '⚡ COMPARE PLAYERS',
-    loading:        'FETCHING PLAYER DATA…',
-    playerStats:    'Player Statistics',
-    comparisonChart:'Comparison Chart',
-    mapAnalysis:    'Map Analysis',
-    downloadJSON:   'Export as JSON',
-    totalMaps:      'MAPS',
-    rank1:          'RANK 1',
-    avgDiff:        'AVG DIFF',
-    mapsLabel:      'MAP',
-    diffLabel:      'DIFF',
-    commonTitle:    'COMMON MAPS',
-    diffTitle:      'EXCLUSIVE MAPS',
-    only:           'ONLY',
-    mapCount:       'Map Count',
-    avgDifficulty:  'Avg Difficulty',
-    errBoth:        'Please enter both player names.',
-    errFetch:       'Could not load data for',
-    errParse:       'No map data found for',
-    errNetwork:     'Network error. Check connection.',
-    noCommon:       'No common maps found.',
-    noDiff:         'No exclusive maps found.',
-    mapsFirst50:    'FIRST 50 MAPS',
-    nameCol:        'NAME',
+    badge:'PLAYER INTEL',tagline:'Head-to-Head Comparison System',
+    player1:'Player 1',player2:'Player 2',compare:'⚡ COMPARE PLAYERS',
+    loading:'FETCHING PLAYER DATA…',playerStats:'Player Statistics',
+    comparisonChart:'Comparison Chart',mapAnalysis:'Map Analysis',
+    downloadJSON:'Export as JSON',totalMaps:'MAPS',rank1:'RANK 1',avgDiff:'AVG DIFF',
+    mapsLabel:'MAP',diffLabel:'DIFF',commonTitle:'COMMON MAPS',diffTitle:'EXCLUSIVE MAPS',
+    only:'ONLY',mapCount:'Map Count',avgDifficulty:'Avg Difficulty',
+    errBoth:'Please enter both player names.',errFetch:'Could not load data for',
+    errParse:'No map data found for',errNetwork:'Network error. Check connection.',
+    noCommon:'No common maps found.',noDiff:'No exclusive maps found.',
+    mapsFirst50:'FIRST 50 MAPS',nameCol:'NAME',
   },
   ar: {
-    badge:          'معلومات اللاعب',
-    tagline:        'نظام المقارنة المباشرة',
-    player1:        'اللاعب الأول',
-    player2:        'اللاعب الثاني',
-    compare:        '⚡ قارن اللاعبين',
-    loading:        'جاري تحميل البيانات…',
-    playerStats:    'إحصائيات اللاعبين',
-    comparisonChart:'مخطط المقارنة',
-    mapAnalysis:    'تحليل الخرائط',
-    downloadJSON:   'تصدير كـ JSON',
-    totalMaps:      'الخرائط',
-    rank1:          'المرتبة 1',
-    avgDiff:        'متوسط الصعوبة',
-    mapsLabel:      'خريطة',
-    diffLabel:      'صعوبة',
-    commonTitle:    'الخرائط المشتركة',
-    diffTitle:      'الخرائط الحصرية',
-    only:           'فقط',
-    mapCount:       'عدد الخرائط',
-    avgDifficulty:  'متوسط الصعوبة',
-    errBoth:        'أدخل اسمَي اللاعبَين.',
-    errFetch:       'تعذّر تحميل بيانات',
-    errParse:       'لم يُعثر على بيانات لـ',
-    errNetwork:     'خطأ في الشبكة.',
-    noCommon:       'لا توجد خرائط مشتركة.',
-    noDiff:         'لا توجد خرائط حصرية.',
-    mapsFirst50:    'أول 50 خريطة',
-    nameCol:        'الاسم',
+    badge:'معلومات اللاعب',tagline:'نظام المقارنة المباشرة',
+    player1:'اللاعب الأول',player2:'اللاعب الثاني',compare:'⚡ قارن اللاعبين',
+    loading:'جاري تحميل البيانات…',playerStats:'إحصائيات اللاعبين',
+    comparisonChart:'مخطط المقارنة',mapAnalysis:'تحليل الخرائط',
+    downloadJSON:'تصدير كـ JSON',totalMaps:'الخرائط',rank1:'المرتبة 1',avgDiff:'متوسط الصعوبة',
+    mapsLabel:'خريطة',diffLabel:'صعوبة',commonTitle:'الخرائط المشتركة',diffTitle:'الخرائط الحصرية',
+    only:'فقط',mapCount:'عدد الخرائط',avgDifficulty:'متوسط الصعوبة',
+    errBoth:'أدخل اسمَي اللاعبَين.',errFetch:'تعذّر تحميل بيانات',
+    errParse:'لم يُعثر على بيانات لـ',errNetwork:'خطأ في الشبكة.',
+    noCommon:'لا توجد خرائط مشتركة.',noDiff:'لا توجد خرائط حصرية.',
+    mapsFirst50:'أول 50 خريطة',nameCol:'الاسم',
   }
 };
 let lang = 'en';
 function t(k){ return (i18n[lang]||i18n.en)[k] || k; }
-// Convert time string like "1:26.86" / "52.58s" / "1:05:10" to seconds
+
 function parseTimeToSecs(s){
   if(!s) return 0;
   s = String(s).replace(/s$/,'').trim();
@@ -1127,50 +1062,30 @@ async function exportImage(){
   if(!window._lastResult){ alert('No data to export yet.'); return; }
   const orig = btn.innerHTML;
   btn.innerHTML = '⏳ Rendering…'; btn.disabled = true;
-
   const players = (window._lastResult.playerData||[]).map(d=>d.name).join('_');
   const filename = `${players}.png`;
   const source = document.getElementById('tab-' + _activeTab) || document.getElementById('results');
-
   const savedDisplay = source.style.display;
   const savedVis     = source.style.visibility;
   const wasHidden    = window.getComputedStyle(source).display === 'none';
-  if(wasHidden){
-    source.style.display    = 'block';
-    source.style.visibility = 'visible';
-  }
-
+  if(wasHidden){ source.style.display='block'; source.style.visibility='visible'; }
   await new Promise(r => setTimeout(r, 80));
-
   const noScrollStyle = document.createElement('style');
   noScrollStyle.id = '__export_noscroll';
   noScrollStyle.textContent = `* { scrollbar-width: none !important; } *::-webkit-scrollbar { display: none !important; width: 0 !important; }`;
   document.head.appendChild(noScrollStyle);
-
   const W = source.offsetWidth  || 1100;
   const H = source.offsetHeight || 600;
-
   try {
-    const dataURL = await domtoimage.toPng(source, {
-      bgcolor: '#0a1628',
-      width:  W,
-      height: H,
-    });
-
+    const dataURL = await domtoimage.toPng(source, { bgcolor: '#0a1628', width: W, height: H });
     document.getElementById('__export_noscroll')?.remove();
     if(wasHidden){ source.style.display = savedDisplay; source.style.visibility = savedVis; }
-
     if(!dataURL || dataURL.length < 500) throw new Error('Image came out empty');
-
     const link = document.createElement('a');
-    link.download = filename;
-    link.href = dataURL;
-    link.click();
-
+    link.download = filename; link.href = dataURL; link.click();
     btn.innerHTML = '✓ Saved!';
     btn.style.borderColor = '#22c55e'; btn.style.color = '#22c55e';
     setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; btn.style.borderColor = ''; btn.style.color = ''; }, 2000);
-
   } catch(e){
     document.getElementById('__export_noscroll')?.remove();
     if(wasHidden){ source.style.display = savedDisplay; source.style.visibility = savedVis; }
@@ -1181,8 +1096,8 @@ async function exportImage(){
 
 function setLang(l){
   lang = l;
-  document.getElementById('btn-en').classList.toggle('active', l==='en');
-  document.getElementById('btn-ar').classList.toggle('active', l==='ar');
+  document.getElementById('btn-en')?.classList.toggle('active', l==='en');
+  document.getElementById('btn-ar')?.classList.toggle('active', l==='ar');
   document.documentElement.setAttribute('lang', l);
   document.documentElement.setAttribute('dir', l==='ar'?'rtl':'ltr');
   document.body.classList.toggle('ar', l==='ar');
@@ -1194,23 +1109,19 @@ function setLang(l){
   if (window._lastResult) renderAll(window._lastResult);
 }
 
-/* ═══════════════════════════════════════════════════════
-   CORS proxy + fetch helpers
-═══════════════════════════════════════════════════════ */
+/* ═══ CORS proxy + fetch helpers ═══ */
 const PROXY_WRAPPERS = [
   url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
   url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
   url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
 ];
 
-function buildFinishedURL(name, page=0, limit=9999){
-  const base = 'https://www.ravenkog.com/api/players/maps';
-  return `${base}?playerName=${encodeURIComponent(name)}&page=${page}&limit=${limit}&sortField=lastFinish&sortOrder=-1&search=&difficulty=`;
+function buildFinishedURL(name, page=0, limit=9999, search='', difficulty=''){
+  return `https://www.ravenkog.com/api/players/maps?playerName=${encodeURIComponent(name)}&page=${page}&limit=${limit}&sortField=lastFinish&sortOrder=-1&search=${encodeURIComponent(search)}&difficulty=${encodeURIComponent(difficulty)}`;
 }
 
 function buildUnfinishedURL(name, page=0, limit=9999){
-  const base = 'https://www.ravenkog.com/api/players/unfinished-maps';
-  return `${base}?playerName=${encodeURIComponent(name)}&page=${page}&limit=${limit}&sortField=releaseDate&sortOrder=-1&search=&difficulty=`;
+  return `https://www.ravenkog.com/api/players/unfinished-maps?playerName=${encodeURIComponent(name)}&page=${page}&limit=${limit}&sortField=releaseDate&sortOrder=-1&search=&difficulty=`;
 }
 
 function fetchWithTimeout(url, ms){
@@ -1273,6 +1184,41 @@ function buildPlayerStatsURL(name){
   return `https://www.ravenkog.com/api/player-stats?playerName=${encodeURIComponent(name)}`;
 }
 
+/* ── Finish-time leaderboard (fetched once, cached globally) ────
+   /api/stats?type=Total finish time returns ALL players.
+   We fetch it once, cache it, then look up each player by name.
+──────────────────────────────────────────────────────────────*/
+const FINISH_STATS_URL = 'https://www.ravenkog.com/api/stats?type=Total%20finish%20time';
+let _finishLeaderboard        = null;
+let _finishLeaderboardPromise = null;
+
+async function loadFinishLeaderboard(){
+  if(_finishLeaderboard) return _finishLeaderboard;
+  if(_finishLeaderboardPromise) return _finishLeaderboardPromise;
+  _finishLeaderboardPromise = (async () => {
+    try {
+      const text = await fetchViaProxy(FINISH_STATS_URL, 14000);
+      const json = JSON.parse(text);
+      const arr  = Array.isArray(json) ? json : (json.data || json.players || json.results || []);
+      _finishLeaderboard = arr;
+      return arr;
+    } catch(_){
+      _finishLeaderboard = [];
+      return [];
+    }
+  })();
+  return _finishLeaderboardPromise;
+}
+
+function getFinishStatsForPlayer(name){
+  if(!_finishLeaderboard || !_finishLeaderboard.length) return null;
+  const lower = name.toLowerCase();
+  return _finishLeaderboard.find(entry => {
+    const n = String(entry.playerName || entry.name || entry.player || '').toLowerCase();
+    return n === lower;
+  }) || null;
+}
+
 async function fetchPlayerStats(name){
   try {
     const text = await fetchViaProxy(buildPlayerStatsURL(name), 12000);
@@ -1295,6 +1241,8 @@ async function fetchPlayerAPI(name, statusCb){
   const finishedTotal = finResult.status   === 'fulfilled' ? finResult.value.total : 0;
   const unfinishedArr = unfinResult.status === 'fulfilled' ? unfinResult.value.arr : [];
   const playerStats   = statsResult.status === 'fulfilled' ? statsResult.value     : null;
+  // Look up player in the already-loaded finish-time leaderboard (single global fetch)
+  const finishStats   = getFinishStatsForPlayer(name);
 
   tried.push(buildFinishedURL(name, 0, 9999));
   tried.push(buildUnfinishedURL(name, 0, 9999));
@@ -1305,6 +1253,7 @@ async function fetchPlayerAPI(name, statusCb){
       json: { data: finishedArr, total: finishedTotal },
       unfinishedArr,
       playerStats,
+      finishStats,
       url: buildFinishedURL(name),
       tried,
       raw: JSON.stringify({ finished: finishedArr.slice(0,3), unfinished: unfinishedArr.slice(0,3) }),
@@ -1315,15 +1264,13 @@ async function fetchPlayerAPI(name, statusCb){
   tried.push('html-fallback');
   try {
     const html = await fetchViaProxy(`https://www.ravenkog.com/players/${encodeURIComponent(name)}`, 15000);
-    return { json: null, html, url: `https://www.ravenkog.com/players/${encodeURIComponent(name)}`, tried, raw: html, unfinishedArr: [] };
+    return { json: null, html, url: `https://www.ravenkog.com/players/${encodeURIComponent(name)}`, tried, raw: html, unfinishedArr: [], finishStats: null };
   } catch(e2){
     throw new Error(`All methods failed for "${name}": ${e2.message}`);
   }
 }
 
-/* ═══════════════════════════════════════════════════════
-   Difficulty helpers
-═══════════════════════════════════════════════════════ */
+/* ═══ Difficulty helpers ═══ */
 const DIFF_MAP = { solo:1, easy:2, main:3, hard:4, insane:5, extreme:6, mod:7 };
 function diffStrToNum(s){
   if(!s) return 0;
@@ -1342,9 +1289,7 @@ function parseAPIResponse(json, name){
 
   const maps = arr.map(item => {
     if(!item || typeof item !== 'object') return null;
-    const mapName = String(
-      item.map || item.mapName || item.map_name || item.name || item.mapId || ''
-    ).trim();
+    const mapName = String(item.map || item.mapName || item.map_name || item.name || item.mapId || '').trim();
     if(!mapName) return null;
     const rank = parseInt(item.rank || item.position || item.serverRank || 0) || 0;
     const diffStr = String(item.difficulty || item.diff || item.tier || item.category || '').trim();
@@ -1376,14 +1321,9 @@ function parsePlayerHTML(html, name){
   const flightRe = /self\.__next_f\.push\(\[1,\s*"([\s\S]*?)"\]\)/g;
   let fm;
   while((fm = flightRe.exec(html)) !== null){
-    try {
-      const unescaped = JSON.parse('"' + fm[1] + '"');
-      flightChunks.push(unescaped);
-    } catch(_){
-      flightChunks.push(fm[1]);
-    }
+    try { const unescaped = JSON.parse('"' + fm[1] + '"'); flightChunks.push(unescaped); }
+    catch(_){ flightChunks.push(fm[1]); }
   }
-
   const allFlight = flightChunks.join(' ');
   const diffLabels = 'Solo|Easy|Main|Hard|Insane|Extreme|Mod';
   const mapRe = new RegExp('"(?:map|mapName|name)"\s*:\s*"([^"]+)"[^}]{0,200}"(?:difficulty|diff|tier)"\s*:\s*"(' + diffLabels + ')"', 'gi');
@@ -1395,33 +1335,18 @@ function parsePlayerHTML(html, name){
       maps.push({ name: mapName, rank: 0, difficulty: diffStrToNum(diffStr), difficultyLabel: diffStr });
     }
   }
-
-  const mapRe2 = new RegExp('"(?:difficulty|diff)"\s*:\s*"(' + diffLabels + ')"[^}]{0,200}"(?:map|mapName|name)"\s*:\s*"([^"]+)"', 'gi');
-  while((mm = mapRe2.exec(allFlight)) !== null){
-    const diffStr = mm[1];
-    const mapName = mm[2].trim();
-    if(mapName && !maps.some(m=>m.name===mapName)){
-      maps.push({ name: mapName, rank: 0, difficulty: diffStrToNum(diffStr), difficultyLabel: diffStr });
-    }
-  }
-
   let totalMaps = maps.length;
   const fm2 = allFlight.match(/[Ff]inished\s+maps[:\s]+(\d+)/);
   if(fm2) totalMaps = Math.max(totalMaps, parseInt(fm2[1]));
-
   const rank1Count = maps.filter(m=>m.rank===1).length;
   const mapsWithDiff = maps.filter(m=>m.difficulty>0);
   const avgDifficulty = mapsWithDiff.length>0
     ? mapsWithDiff.reduce((s,m)=>s+m.difficulty,0)/mapsWithDiff.length : 0;
-
   if(/404|not found/i.test(html.slice(0,2000)) && maps.length===0) throw new Error('404');
-
   return { name, maps: maps.slice(0,50), totalMaps, rank1Count, globalRank:0, avgDifficulty: +avgDifficulty.toFixed(2) };
 }
 
-/* ═══════════════════════════════════════════════════════
-   UI Helpers
-═══════════════════════════════════════════════════════ */
+/* ═══ UI Helpers ═══ */
 function showStatus(msg, isError=false){
   const el = document.getElementById('status');
   el.textContent = msg;
@@ -1449,7 +1374,6 @@ function formatTime(raw){
   if(!raw || raw === '—') return '—';
   raw = String(raw).trim();
   const parts = raw.split(':');
-
   function trimSecs(s){
     const dot = s.indexOf('.');
     if(dot === -1) return s;
@@ -1457,16 +1381,13 @@ function formatTime(raw){
     const dec = s.slice(dot + 1, dot + 3);
     return dec === '00' ? intPart : `${intPart}.${dec}`;
   }
-
   if(parts.length === 3){
     const h = parseInt(parts[0]), m = parseInt(parts[1]), s = trimSecs(parts[2]);
     if(h > 0) return `${h}:${String(m).padStart(2,'0')}:${s.length < 2 ? s.padStart(2,'0') : s}`;
     if(m > 0) return `${m}:${s.padStart(5,'0')}`;
     return `${s}s`;
   }
-  if(parts.length === 2){
-    return `${parts[0]}:${trimSecs(parts[1]).padStart(5,'0')}`;
-  }
+  if(parts.length === 2) return `${parts[0]}:${trimSecs(parts[1]).padStart(5,'0')}`;
   return trimSecs(raw);
 }
 
@@ -1484,46 +1405,30 @@ function buildDiffBar(maps){
   return `<div class="diff-dist-bar" title="Difficulty distribution">${segs}</div>`;
 }
 
-/* ═══════════════════════════════════════════════════════
-   computeSkillLevel — single source of truth
-   Returns the difficulty number (1–6) that best represents
-   the player's skill level, considering both completion %
-   AND Rank-1 achievements at higher difficulties.
-═══════════════════════════════════════════════════════ */
 function computeSkillLevel(maps) {
-  // Per-difficulty finished counts
   const pdc = {};
   maps.forEach(m => { if(m.difficulty > 0) pdc[m.difficulty] = (pdc[m.difficulty]||0) + 1; });
 
-  // ── Step 1: completion-based skill ───────────────────────────
   let completionSkill = 0;
   if(window._diffTotalsLoaded && Object.keys(window._diffTotals).length > 0){
-    // Primary: ≥50% of that difficulty's total maps
     for(let d = 6; d >= 1; d--){
       const tot = window._diffTotals[d]||0, fin = pdc[d]||0;
       if(tot > 0 && fin/tot >= 0.5){ completionSkill = d; break; }
     }
-    // Fallback 1: ≥20%
     if(!completionSkill) for(let d = 6; d >= 1; d--){
       const tot = window._diffTotals[d]||0, fin = pdc[d]||0;
       if(tot > 0 && fin/tot >= 0.2){ completionSkill = d; break; }
     }
-    // Fallback 2: ≥10% or ≥10 maps finished
     if(!completionSkill) for(let d = 6; d >= 1; d--){
       const tot = window._diffTotals[d]||0, fin = pdc[d]||0;
       if(fin >= 10 || (tot > 0 && fin/tot >= 0.1)){ completionSkill = d; break; }
     }
   } else {
-    // Server totals not yet available — use highest difficulty present
     for(let d = 6; d >= 1; d--){
       if(maps.some(m => m.difficulty === d)){ completionSkill = d; break; }
     }
   }
 
-  // ── Step 2: Rank-1 boost ─────────────────────────────────────
-  // If player has ≥3 Rank #1 finishes in difficulty D,
-  // they clearly belong at D+1 (capped at Extreme = 6).
-  // We never DOWNGRADE: final = max(completionSkill, rank1Boost).
   const r1ByDiff = {};
   maps.forEach(m => {
     if(m.rank === 1 && m.difficulty > 0)
@@ -1533,8 +1438,6 @@ function computeSkillLevel(maps) {
   for(let d = 6; d >= 1; d--){
     if((r1ByDiff[d]||0) >= 3){ rank1Boost = Math.min(d + 1, 6); break; }
   }
-
-  // ── Final: never downgrade ───────────────────────────────────
   return Math.max(completionSkill, rank1Boost);
 }
 
@@ -1654,18 +1557,14 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
     ? (rankedMaps.reduce((s, m) => s + m.rank, 0) / rankedMaps.length).toFixed(1)
     : null;
 
-  // Wasted time = total finish time of ALL finished maps (from base.maps with time)
-  const totalSecs = base.maps.reduce((s, m) => s + parseTimeToSecs(m.time), 0);
-  function fmtWastedTime(secs){
-    if(secs <= 0) return null;
-    const h = Math.floor(secs / 3600);
-    const m = Math.floor((secs % 3600) / 60);
-    const s = Math.floor(secs % 60);
-    if(h > 0) return `${h}h ${m}m`;
-    if(m > 0) return `${m}m ${s}s`;
-    return `${s}s`;
-  }
-  const wastedLabel = fmtWastedTime(totalSecs);
+  // Wasted time — prefer API stats (accurate, counts all finishes) over summed best-times
+  const fs = base.finishStats || null;
+  // Try multiple possible field names from the API response
+  // Use exact API field names: total_finishes, total_finish_time_formatted
+  const apiFinishCount = fs ? (fs.total_finishes || null) : null;
+  const apiTimeLabel   = fs ? (fs.total_finish_time_formatted || null) : null;
+  const finishCountLabel = apiFinishCount != null ? Number(apiFinishCount).toLocaleString() : null;
+  const wastedLabel      = apiTimeLabel || null;
 
   const searchInputId = `mapSearch-${idx}`;
 
@@ -1676,11 +1575,16 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
         <div class="player-label">PLAYER ${idx < 10 ? '0'+idx : idx}</div>
         <div class="player-name">${esc(data.name)}</div>
         ${avgRank ? `<div class="player-avg-rank">avg rank <span style="color:${color}">#${avgRank}</span></div>` : ''}
-        ${wastedLabel ? `<div class="player-avg-rank" style="margin-top:2px"><span style="color:var(--text-dim);font-size:10px;letter-spacing:.04em" title="Total time spent finishing all maps">⏱ ${wastedLabel}</span></div>` : ''}
       </div>
       ${r1Pill}
       ${completionRing}
     </div>
+    ${(finishCountLabel || wastedLabel) ? `<div style="padding:5px 18px 6px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.15)">
+      <span style="font-size:10px;color:var(--muted)">🏁</span>
+      <span style="font-size:11px;color:${color};font-family:var(--font-head);font-weight:700;letter-spacing:.04em">${finishCountLabel || '—'}</span>
+      <span style="font-size:11px;color:var(--text-dim)">finishes</span>
+      ${wastedLabel ? `<span style="font-size:11px;color:var(--text-dim);margin-left:2px">⏱ <span style="color:var(--text)">${wastedLabel}</span></span>` : ''}
+    </div>` : ''}
     <div class="stats-row">
       <div class="stat-box">
         <span class="stat-val" style="color:${color};font-size:${mapsValSize}" ${isFiltered ? '' : `data-target="${base.totalMaps}"`}>${mapsStatVal}</span>
@@ -1732,23 +1636,11 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
     </div>`;
 }
 
-function togglePlayerUnfin(cardId, header){
-  const section = document.getElementById(`unfinSection-${cardId}`);
-  const arrow   = document.getElementById(`unfinArrow-${cardId}`);
-  if(!section) return;
-  const open = section.style.display !== 'none';
-  section.style.display = open ? 'none' : 'block';
-  if(arrow) arrow.textContent = open ? '▼ SHOW' : '▲ HIDE';
-}
-
 function buildChart(playerData, fullPlayerData){
   const fullData = fullPlayerData || playerData;
   const maxMaps  = Math.max(...playerData.map(d => d.totalMaps), 1);
-  const maxRank1 = Math.max(...playerData.map(d => d.rank1Count), 1);
 
-  function getSkillNum(d){
-    return computeSkillLevel(d.maps);
-  }
+  function getSkillNum(d){ return computeSkillLevel(d.maps); }
 
   function metricRows(label, getValue, fmtVal){
     const rows = playerData.map(d => {
@@ -1782,7 +1674,7 @@ function buildChart(playerData, fullPlayerData){
 
   return `<div class="bars-container">
     ${metricRows(t('mapCount'), d => d.totalMaps, (d,v) => v)}
-    ${metricRows('RANK #1',     d => d.rank1Count, (d,v) => v > 0 ? `★ ${v}` : '')}
+    ${metricRows('RANK #1', d => d.rank1Count, (d,v) => v > 0 ? `★ ${v}` : '')}
     <div class="bar-group"><div class="bar-label">SKILL LEVEL</div>${skillRows}</div>
   </div>`;
 }
@@ -1960,7 +1852,6 @@ function buildDiffPanel(playerData, exclusivesFiltered){
 
     const colId = `excl-col-${i}`;
     const initial = d.name.charAt(0).toUpperCase();
-
     const total = ex.length + unfinMaps.length;
     const pct = total > 0 ? ((ex.length / total) * 100).toFixed(1) : 0;
 
@@ -2021,7 +1912,6 @@ function toggleUnfinished(colId){
 }
 
 function buildNeitherPanel(neither){
-  // Sort based on current _sortNeither state
   let sorted = [...neither];
   if(_sortNeither === 'desc')      sorted.sort((a,b) => (b.points||0) - (a.points||0));
   else if(_sortNeither === 'asc')  sorted.sort((a,b) => (a.points||0) - (b.points||0));
@@ -2052,8 +1942,6 @@ function buildNeitherPanel(neither){
   if(!rows) rows = `<div class="empty-msg">— ${neither.length === 0 ? 'No maps both players need — or unfinished data unavailable.' : 'None matching.'} —</div>`;
 
   const searchId = 'neitherSearch';
-
-  // Sort button label + style
   const sortLabel = _sortNeither === 'desc' ? '↓ PTS ✓' : _sortNeither === 'asc' ? '↑ PTS ✓' : '⇅ PTS';
   const sortActive = _sortNeither !== 'none';
   const sortColor = _sortNeither === 'desc' ? '#fde047' : _sortNeither === 'asc' ? '#2dd4bf' : 'var(--border2)';
@@ -2069,11 +1957,7 @@ function buildNeitherPanel(neither){
                  color:${sortTextColor};
                  font-family:var(--font-head);font-size:11px;letter-spacing:.08em;
                  padding:4px 12px;cursor:pointer;transition:all .15s;white-space:nowrap;
-                 ${sortActive ? `box-shadow:0 0 10px ${sortColor}55;` : ''}"
-          onmouseover="this.style.borderColor='#fde047';this.style.color='#fde047'"
-          onmouseout="this.style.borderColor='${sortColor}';this.style.color='${sortTextColor}'"
-          title="Sort by points: high→low → low→high → default">
-          ${sortLabel}
+                 ${sortActive ? `box-shadow:0 0 10px ${sortColor}55;` : ''}">${sortLabel}
         </button>` : ''}
         <input id="${searchId}" type="text" placeholder="search…"
           oninput="filterPanel('${searchId}','.neither-row')"
@@ -2084,16 +1968,12 @@ function buildNeitherPanel(neither){
         <button onclick="copyNeitherList()"
           style="background:transparent;border:1px solid var(--border2);color:var(--text-dim);
                  font-family:var(--font-head);font-size:11px;padding:4px 10px;
-                 cursor:pointer;letter-spacing:.08em;transition:all .15s;white-space:nowrap;"
-          onmouseover="this.style.borderColor='var(--cyan)';this.style.color='var(--cyan)'"
-          onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text-dim)'"
-          title="Copy map names to clipboard">
+                 cursor:pointer;letter-spacing:.08em;transition:all .15s;white-space:nowrap;">
           COPY LIST
         </button>
       </div>
     </div>
-    ${hasPoints ? `<div style="display:flex;align-items:center;gap:8px;padding:5px 14px;
-        background:rgba(253,224,71,.04);border-bottom:1px solid var(--border);">
+    ${hasPoints ? `<div style="display:flex;align-items:center;gap:8px;padding:5px 14px;background:rgba(253,224,71,.04);border-bottom:1px solid var(--border);">
       <span class="h2h-idx" style="visibility:hidden">0</span>
       <span style="flex:1;font-size:10px;letter-spacing:.12em;color:var(--muted)">MAP NAME</span>
       <span style="font-size:10px;letter-spacing:.1em;color:var(--muted);width:58px;text-align:right">POINTS</span>
@@ -2103,13 +1983,13 @@ function buildNeitherPanel(neither){
 }
 
 function cycleNeitherSort(){
-  // desc → asc → none → desc …
   if(_sortNeither === 'desc')       _sortNeither = 'asc';
   else if(_sortNeither === 'asc')   _sortNeither = 'none';
   else                              _sortNeither = 'desc';
   if(window._lastResult) renderAll(window._lastResult);
 }
 
+// Old client-side filter kept for neitherPanel only
 function filterMapsScroll(inputId, scrollId){
   const q = document.getElementById(inputId)?.value?.toLowerCase().trim() || '';
   const scroll = document.getElementById(scrollId);
@@ -2143,11 +2023,11 @@ function copyNeitherList(){
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 let _activeDiff = 'all';
 let _activeTab  = 'overview';
-let _sortRank = {}; // per player: 'none'|'rank-asc'|'rank-desc'|'time-asc'|'time-desc'
+let _sortRank = {};
 let _sortCommon = false;
-let _sortNeither = 'desc'; // 'desc' = high→low points, 'asc' = low→high, 'none' = default
+let _sortNeither = 'desc';
 
-function updateTabIndicator(){ /* no-op */ }
+function updateTabIndicator(){ }
 
 function setTab(tab){
   _activeTab = tab;
@@ -2244,19 +2124,14 @@ function setOverviewPage(page){
   if(btn2){ btn2.style.borderBottomColor = page===2 ? '#fde047' : 'transparent'; btn2.style.color = page===2 ? '#fde047' : 'var(--text-dim)'; }
 }
 
-/* ═══════════════════════════════════════════════════════
-   Points Progression Panel
-═══════════════════════════════════════════════════════ */
 function buildPointsPanel(playerData){
   function getCumulativePoints(d){
     const mapsWithPts = (d.maps || []).filter(m => (m.points||0) > 0);
     if(!mapsWithPts.length) return [];
-    // API sorts by lastFinish desc — reverse = chronological oldest→newest
     const chrono = [...mapsWithPts].reverse();
     let cum = 0;
     return chrono.map(m => {
       cum += m.points;
-      // Parse lastFinish: could be unix ms, unix s, or ISO string
       let ts = null;
       if(m.lastFinish){
         const raw = m.lastFinish;
@@ -2286,23 +2161,17 @@ function buildPointsPanel(playerData){
         <span class="badge" style="background:#fde047;color:#000">★</span>
         POINTS PROGRESSION
       </div>
-      <div class="empty-msg" style="padding:40px">— No points data — (maps API may not return point values) —</div>
+      <div class="empty-msg" style="padding:40px">— No points data —</div>
     </div>`;
   }
 
-  // Check if we have valid dates for any series
   const hasDates = series.some(s => s.cumulative.some(p => p.ts));
-
-  // Build a unified time domain if we have dates
   let allTs = [];
-  if(hasDates){
-    series.forEach(s => s.cumulative.forEach(p => { if(p.ts) allTs.push(p.ts.getTime()); }));
-  }
+  if(hasDates){ series.forEach(s => s.cumulative.forEach(p => { if(p.ts) allTs.push(p.ts.getTime()); })); }
   const minTs = hasDates ? Math.min(...allTs) : 0;
   const maxTs = hasDates ? Math.max(...allTs) : 0;
   const tsRange = maxTs - minTs || 1;
 
-  // For x-axis: use timestamp if available, else use index
   function getX(p, total, idx){
     if(hasDates && p.ts) return (p.ts.getTime() - minTs) / tsRange;
     return idx / total;
@@ -2333,11 +2202,6 @@ function buildPointsPanel(playerData){
     return String(v);
   }
 
-  function fmtDate(ts){
-    return new Date(ts).getFullYear().toString();
-  }
-
-  // Y grid
   const yTicks = 5;
   let grid = '', yLabels = '';
   for(let t = 0; t <= yTicks; t++){
@@ -2347,11 +2211,9 @@ function buildPointsPanel(playerData){
     yLabels += `<text x="${PAD.l-8}" y="${y.toFixed(1)}" dominant-baseline="middle" text-anchor="end" class="pts-axis-label">${fmtPts(v)}</text>`;
   }
 
-  // X axis ticks — one per unique year, with minimum pixel spacing to avoid overlap
   let xLabels = '';
   if(hasDates){
-    // Collect all unique years from data, map to their first occurrence ratio
-    const yearMap = new Map(); // year → earliest ratio
+    const yearMap = new Map();
     series.forEach(s => {
       s.cumulative.forEach((p, i) => {
         if(!p.ts) return;
@@ -2360,43 +2222,30 @@ function buildPointsPanel(playerData){
         if(!yearMap.has(yr) || ratio < yearMap.get(yr)) yearMap.set(yr, ratio);
       });
     });
-    // Add the start year at ratio 0
     const startYear = new Date(minTs).getFullYear();
     if(!yearMap.has(startYear)) yearMap.set(startYear, 0);
-
-    // Sort years and enforce min spacing (30px in viewBox coords = 30/chartW ratio)
     const minSpacing = 35 / chartW;
     const sortedYears = [...yearMap.entries()].sort((a,b) => a[1]-b[1]);
     let lastPlacedRatio = -999;
     sortedYears.forEach(([yr, ratio]) => {
-      if(ratio - lastPlacedRatio < minSpacing) return; // too close, skip
+      if(ratio - lastPlacedRatio < minSpacing) return;
       lastPlacedRatio = ratio;
       const x = px(ratio);
-      // Dashed vertical line
       xLabels += `<line x1="${x.toFixed(1)}" y1="${PAD.t}" x2="${x.toFixed(1)}" y2="${PAD.t+chartH}" stroke="rgba(255,255,255,.07)" stroke-width="1" stroke-dasharray="3,5"/>`;
       xLabels += `<text x="${x.toFixed(1)}" y="${PAD.t+chartH+18}" text-anchor="middle" class="pts-axis-label">${yr}</text>`;
     });
-  } else {
-    const maxX = Math.max(...series.map(s => s.cumulative.length), 1);
-    for(let t = 0; t <= 6; t++){
-      const i = Math.round((maxX / 6) * t);
-      xLabels += `<text x="${px(i/maxX).toFixed(1)}" y="${PAD.t+chartH+18}" text-anchor="middle" class="pts-axis-label">${i}</text>`;
-    }
   }
 
-  // Chart frame
+  const xAxisLabel = hasDates ? 'date of completion' : 'maps completed (chronological order)';
   let svgBody = `<rect x="${PAD.l}" y="${PAD.t}" width="${chartW}" height="${chartH}" fill="rgba(0,0,0,.25)" rx="3"/>`;
   svgBody += grid;
   svgBody += `<line x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${PAD.t+chartH}" stroke="rgba(255,255,255,.12)" stroke-width="1"/>`;
   svgBody += `<line x1="${PAD.l}" y1="${PAD.t+chartH}" x2="${PAD.l+chartW}" y2="${PAD.t+chartH}" stroke="rgba(255,255,255,.12)" stroke-width="1"/>`;
   svgBody += yLabels + xLabels;
-  const xAxisLabel = hasDates ? 'date of completion' : 'maps completed (chronological order)';
   svgBody += `<text x="${PAD.l + chartW/2}" y="${H - 4}" text-anchor="middle" class="pts-axis-label" style="font-size:10px">${xAxisLabel}</text>`;
 
-  // Lines per player — draw areas first, then lines on top
   const seriesWithData = series.filter(s => s.cumulative.length > 0);
 
-  // Pass 1: areas (behind everything)
   seriesWithData.forEach(s => {
     const total = s.cumulative.length;
     const last  = s.cumulative[total - 1];
@@ -2408,15 +2257,11 @@ function buildPointsPanel(playerData){
     svgBody += `<path d="${areaD}" fill="${s.color}" fill-opacity="0.07"/>`;
   });
 
-  // Pass 2: lines + dots
-  // Collect end-label positions to avoid overlap
   const endLabels = [];
   seriesWithData.forEach(s => {
     const total = s.cumulative.length;
     const last  = s.cumulative[total - 1];
     const lastR = getX(last, total, total - 1);
-
-    // Smooth line using polyline (enough points for smooth appearance)
     const pts = s.cumulative.map((p,i)=>{
       const r = getX(p,total,i);
       return `${px(r).toFixed(1)},${py(p.pts).toFixed(1)}`;
@@ -2424,16 +2269,12 @@ function buildPointsPanel(playerData){
     svgBody += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5"
       stroke-linecap="round" stroke-linejoin="round"
       style="filter:drop-shadow(0 0 4px ${s.color}88)"/>`;
-
-    // End dot with glow
     const ex = px(lastR), ey = py(last.pts);
     svgBody += `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="6" fill="${s.color}" opacity="0.25"/>`;
     svgBody += `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="4" fill="${s.color}" stroke="#0a0f18" stroke-width="1.5" style="filter:drop-shadow(0 0 8px ${s.color})"/>`;
-
     endLabels.push({ color: s.color, pts: last.pts, ey, label: fmtPts(last.pts) });
   });
 
-  // Anti-overlap for right-side labels: sort by ey, push apart by min 14px
   endLabels.sort((a,b) => a.ey - b.ey);
   const minLabelGap = 14;
   for(let i = 1; i < endLabels.length; i++){
@@ -2451,7 +2292,6 @@ function buildPointsPanel(playerData){
   const svgHtml = `<svg class="pts-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"
     style="width:100%;height:auto;min-height:180px;max-height:340px;display:block">${svgBody}</svg>`;
 
-  // Totals row — bigger names
   const totalsHtml = series.map(s => `
     <div class="pts-total-cell">
       <div class="pts-total-val" style="color:${s.color};text-shadow:0 0 20px ${s.color}66">${s.totalPts.toLocaleString()}</div>
@@ -2459,7 +2299,6 @@ function buildPointsPanel(playerData){
       <div class="pts-total-lbl">TOTAL PTS</div>
     </div>`).join('');
 
-  // Legend
   const legendHtml = series.map(s => `
     <div class="pts-legend-item">
       <div class="pts-legend-dot" style="background:${s.color};box-shadow:0 0 6px ${s.color}"></div>
@@ -2476,12 +2315,9 @@ function buildPointsPanel(playerData){
     <div class="pts-total-row">${totalsHtml}</div>
     <div class="pts-chart-wrap" style="padding:16px 20px 12px">${svgHtml}</div>
     <div class="pts-legend">${legendHtml}</div>
-  </div>`;}
+  </div>`;
+}
 
-
-/* ═══════════════════════════════════════════════════════
-   Render All
-═══════════════════════════════════════════════════════ */
 function renderAll({ playerData, common, exclusives, neitherMaps }){
   try {
   const maxMaps = Math.max(...playerData.map(d => d.maps.length), 1);
@@ -2540,7 +2376,6 @@ function renderAll({ playerData, common, exclusives, neitherMaps }){
     document.querySelectorAll('.stat-val[data-target]').forEach(el => {
       const target = parseInt(el.dataset.target);
       if(isNaN(target) || target === 0) return;
-      el.classList.add('animating');
       let dur = 500; const t0 = performance.now();
       const tick = now => {
         const p = Math.min((now - t0) / dur, 1);
@@ -2566,16 +2401,14 @@ function renderAll({ playerData, common, exclusives, neitherMaps }){
   updateTabIndicator();
   } catch(err){
     console.error('renderAll error:', err);
-    showStatus('Render error: ' + err.message + ' — ' + (err.stack||'').split('\n')[1], true);
+    showStatus('Render error: ' + err.message, true);
   }
 }
 
 function rebuildTabs(playerData){
   const playersBar = document.getElementById('tabBarPlayers');
   const container  = document.getElementById('playerTabsContainer');
-
   playersBar.innerHTML = '';
-
   playerData.forEach((d, i) => {
     const btn = document.createElement('button');
     btn.className = 'tab-btn player-tab-btn';
@@ -2586,7 +2419,6 @@ function rebuildTabs(playerData){
     btn.onclick = () => setTab(`player-${i}`);
     playersBar.appendChild(btn);
   });
-
   container.innerHTML = '';
   playerData.forEach((d, i) => {
     const pane = document.createElement('div');
@@ -2611,26 +2443,21 @@ function showRaw(idx){
   _debugActivePlayer = idx;
   const html = window._rawHtmls[idx-1] || '';
   document.getElementById('rawHtmlBox').value = html.slice(0, 6000) + (html.length > 6000 ? '\n\n… (truncated)' : '');
-
   if(html){
     const p = new DOMParser();
     const d = p.parseFromString(html, 'text/html');
-    const tables   = d.querySelectorAll('table');
-    const rows     = d.querySelectorAll('tr');
-    const links    = d.querySelectorAll('a');
-    const classes  = [...new Set([...d.querySelectorAll('[class]')].map(e=>typeof e.className==='string'?e.className.trim():(e.getAttribute('class')||'')).filter(Boolean))].slice(0,20);
-    const allText  = d.body ? d.body.innerText||d.body.textContent : '';
+    const tables = d.querySelectorAll('table');
+    const rows = d.querySelectorAll('tr');
+    const links = d.querySelectorAll('a');
+    const allText = d.body ? d.body.innerText||d.body.textContent : '';
     const lineCount = allText.split('\n').filter(l=>l.trim()).length;
-
     document.getElementById('dbg-stats').innerHTML = `
       <strong style="color:var(--text)">Structure of Player ${idx} page:</strong><br>
       📄 Title: <span style="color:var(--amber)">${esc(d.title||'—')}</span><br>
       📊 Tables: <span style="color:var(--cyan)">${tables.length}</span> &nbsp;|&nbsp;
       Rows: <span style="color:var(--cyan)">${rows.length}</span> &nbsp;|&nbsp;
       Links: <span style="color:var(--cyan)">${links.length}</span> &nbsp;|&nbsp;
-      Text lines: <span style="color:var(--cyan)">${lineCount}</span><br>
-      🏷 Classes found: <span style="color:#86efac;font-size:14px">${classes.map(c=>`<code style="background:var(--bg3);padding:1px 4px">${esc(c)}</code>`).join(' ')}</span><br>
-      📝 First 500 chars of text: <span style="color:var(--text-dim);font-size:14px">${esc(allText.replace(/\s+/g,' ').trim().slice(0,500))}</span>
+      Text lines: <span style="color:var(--cyan)">${lineCount}</span>
     `;
   }
 }
@@ -2642,53 +2469,14 @@ function downloadRawHtml(){
   const blob = new Blob([html], {type:'text/html'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = `ravenkog_raw_player${idx}.html`;
-  a.click();
+  a.href = url; a.download = `ravenkog_raw_player${idx}.html`; a.click();
   URL.revokeObjectURL(url);
 }
 
 async function scanBundles(){
   const box = document.getElementById('rawHtmlBox');
-  const stats = document.getElementById('dbg-stats');
-  box.value = '🔬 Scanning JS bundles for API fetch() calls…\n';
-  stats.innerHTML = '';
-
-  const BUNDLES = [
-    'https://www.ravenkog.com/_next/static/chunks/ab9413372a86c198.js',
-    'https://www.ravenkog.com/_next/static/chunks/b8f7be56fbbfcc55.js',
-    'https://www.ravenkog.com/_next/static/chunks/d2c9c9d2a3057ca7.js',
-    'https://www.ravenkog.com/_next/static/chunks/4654593a4a9d85a2.js',
-    'https://www.ravenkog.com/_next/static/chunks/ef1b1e8a9d02b114.js',
-  ];
-
-  let allFindings = [];
-  for(const url of BUNDLES){
-    box.value += `\nFetching ${url.split('/').pop()}…`;
-    try {
-      const src = await fetchViaProxy(url, 12000);
-      const fetches = [...src.matchAll(/fetch\s*\(\s*[`"'](\/[^`"']+)[`"']/g)].map(m=>m[1]);
-      const apiPaths = [...src.matchAll(/"(\/api\/[a-zA-Z0-9_\-\/\[\]{}$]+)"/g)].map(m=>m[1]);
-      const tmplPaths = [...src.matchAll(/`(\/api\/[^`]+)`/g)].map(m=>m[1]);
-      const combined = [...new Set([...fetches, ...apiPaths, ...tmplPaths])];
-      if(combined.length > 0){
-        box.value += ` → found ${combined.length} path(s)`;
-        allFindings.push(...combined.map(p => `[${url.split('/').pop()}] ${p}`));
-      } else {
-        box.value += ` → no API paths`;
-      }
-    } catch(e){
-      box.value += ` → failed: ${e.message}`;
-    }
-  }
-
-  box.value += '\n\n═══ ALL FOUND API PATHS ═══\n';
-  if(allFindings.length === 0){
-    box.value += '(none found — the API URL may be dynamically constructed or obfuscated)\n';
-  } else {
-    box.value += allFindings.join('\n');
-  }
-  stats.innerHTML = `<strong style="color:var(--cyan)">Bundle scan complete.</strong> Found <strong style="color:var(--amber)">${allFindings.length}</strong> API path(s). Copy the results above and share them.`;
+  box.value = '🔬 Scanning JS bundles…\n';
+  box.value += '\n(Bundle scan requires network access)';
 }
 
 function updateDebugCounts(d1, d2){
@@ -2716,13 +2504,8 @@ function downloadJSON(){
   URL.revokeObjectURL(url);
 }
 
-/* ═══════════════════════════════════════════════════════
-   Multi-player tag input
-═══════════════════════════════════════════════════════ */
-const PLAYER_COLORS = [
-  '#f59e0b','#22d3ee','#a78bfa','#22c55e',
-  '#f87171','#fb923c','#e879f9','#2dd4bf'
-];
+/* ═══ Tag input ═══ */
+const PLAYER_COLORS = ['#f59e0b','#22d3ee','#a78bfa','#22c55e','#f87171','#fb923c','#e879f9','#2dd4bf'];
 let _tagPlayers = [];
 
 function renderTags(){
@@ -2765,11 +2548,8 @@ document.getElementById('tagField').addEventListener('keydown', e => {
   if(e.key === 'Enter'){
     e.preventDefault();
     const val = field.value.replace(/,/g,'').trim();
-    if(val){
-      addTag(val); field.value = '';
-    } else if(_tagPlayers.length >= 2){
-      startCompare();
-    }
+    if(val){ addTag(val); field.value = ''; }
+    else if(_tagPlayers.length >= 2){ startCompare(); }
   } else if(e.key === ','){
     e.preventDefault();
     const val = field.value.replace(/,/g,'').trim();
@@ -2787,9 +2567,7 @@ document.getElementById('tagField').addEventListener('input', e => {
 });
 renderTags();
 
-/* ═══════════════════════════════════════════════════════
-   Main Compare Flow
-═══════════════════════════════════════════════════════ */
+/* ═══ Main Compare Flow ═══ */
 async function startCompare(){
   const field = document.getElementById('tagField');
   const pending = field.value.replace(/,/g,'').trim();
@@ -2810,12 +2588,17 @@ async function startCompare(){
   showLoader(true);
   document.getElementById('compareBtn').disabled = true;
   window._rawHtmls = [];
+  // Reset leaderboard cache so each compare gets fresh data
+  _finishLeaderboard        = null;
+  _finishLeaderboardPromise = null;
 
   try {
     showStatus(`Fetching data for ${_tagPlayers.length} players…`);
+    // Load leaderboard + diff totals ONCE before fetching individual players
+    await Promise.allSettled([loadFinishLeaderboard(), loadDiffTotals()]);
+
     const [settled] = await Promise.all([
       Promise.allSettled(_tagPlayers.map(p => fetchPlayerAPI(p.name, () => {}))),
-      loadDiffTotals(),
     ]);
 
     window._rawHtmls = settled.map(s => s.status === 'fulfilled' ? (s.value.json ? JSON.stringify(s.value.json,null,2) : (s.value.html||'')) : '');
@@ -2832,6 +2615,7 @@ async function startCompare(){
         d.color = _tagPlayers[i].color;
         d.unfinishedArr = r.unfinishedArr || [];
         d.playerStats   = r.playerStats   || null;
+        d.finishStats   = r.finishStats   || null;
         playerData.push(d);
       } catch(e){
         failed.push(name + (e.message === '404' ? ' (not found)' : ''));
@@ -2909,9 +2693,7 @@ function savePlayersToURL(playerData){
   if(names.length >= 2) setTimeout(() => startCompare(), 200);
 })();
 
-/* ═══════════════════════════════════════════════════════
-   Difficulty stats popup
-═══════════════════════════════════════════════════════ */
+/* ═══ Difficulty stats popup ═══ */
 window._diffTotals = {};
 window._diffTotalsLoaded = false;
 window._diffTotalsPromise = null;
@@ -2931,7 +2713,7 @@ async function loadDiffTotals(){
       });
       window._diffTotals = counts;
       window._diffTotalsLoaded = true;
-    } catch(_){ /* non-fatal */ }
+    } catch(_){ }
   })();
   return window._diffTotalsPromise;
 }
