@@ -456,6 +456,7 @@
     font-family: var(--font-head); font-size: 30px; font-weight: 800;
     color: var(--pc, var(--amber)); display: block; line-height: 1; letter-spacing: -.02em;
     text-shadow: 0 0 28px color-mix(in srgb, var(--pc, var(--amber)) 50%, transparent);
+    white-space: nowrap; overflow: hidden;
   }
   .stat-lbl { font-size: 9px; color: var(--text-dim); letter-spacing: .14em; text-transform: uppercase; margin-top: 8px; }
   .stat-spark { height: 3px; background: var(--border); margin: 10px 14px 0; border-radius: 2px; overflow: hidden; }
@@ -467,9 +468,10 @@
     padding: 9px 12px; font-size: 11px; letter-spacing: .1em;
     color: var(--text-dim); text-transform: uppercase;
     background: rgba(0,0,0,.3); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 6px;
     position: sticky; top: 0; z-index: 3;
     backdrop-filter: blur(8px);
+    overflow: visible;
   }
   .maps-col-header {
     display: flex; align-items: center; gap: 5px;
@@ -1349,7 +1351,8 @@ function parseAPIResponse(json, name){
     const diffNum = diffStrToNum(diffStr);
     const time = String(item.finishTime || item.finish_time || item.time || '').trim();
     const points = parseInt(item.points || item.stars || item.score || item.mapPoints || 0) || 0;
-    return { name: mapName, rank, difficulty: diffNum, difficultyLabel: diffStr, time, points };
+    const lastFinish = item.lastFinish || item.last_finish || item.finishedAt || item.date || item.timestamp || null;
+    return { name: mapName, rank, difficulty: diffNum, difficultyLabel: diffStr, time, points, lastFinish };
   }).filter(Boolean);
 
   const rank1Count = maps.filter(m => m.rank === 1).length;
@@ -1570,6 +1573,8 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
 
   const pctMaps = ((base.totalMaps / mx) * 100).toFixed(1);
   const mapsStatVal   = isFiltered ? `${shownCount}<span style="font-size:17px;opacity:.6"> / ${totalInDiff}</span>` : String(base.totalMaps);
+  const mapsValLen    = isFiltered ? String(shownCount).length + String(totalInDiff).length + 3 : String(base.totalMaps).length;
+  const mapsValSize   = mapsValLen <= 5 ? '30px' : mapsValLen <= 8 ? '22px' : '18px';
   const mapsStatLabel = isFiltered ? `${DIFF_LABEL_ORDER[parseInt(_activeDiff)]||'?'} MAPS` : t('totalMaps');
   const mapsSparkPct  = isFiltered ? (totalInDiff > 0 ? ((shownCount/totalInDiff)*100).toFixed(1) : 0) : pctMaps;
 
@@ -1678,7 +1683,7 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
     </div>
     <div class="stats-row">
       <div class="stat-box">
-        <span class="stat-val" style="color:${color}" ${isFiltered ? '' : `data-target="${base.totalMaps}"`}>${mapsStatVal}</span>
+        <span class="stat-val" style="color:${color};font-size:${mapsValSize}" ${isFiltered ? '' : `data-target="${base.totalMaps}"`}>${mapsStatVal}</span>
         <div class="stat-lbl">${mapsStatLabel}</div>
         <div class="stat-spark"><div class="stat-spark-fill" style="width:${mapsSparkPct}%;background:${color};box-shadow:1px 0 6px ${color}"></div></div>
       </div>
@@ -1695,31 +1700,25 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
     </div>
     ${buildDiffBar(base.maps)}
     <div class="maps-list-header">
-      <span style="flex:1;font-size:12px;letter-spacing:.12em">${listTitle}</span>
+      <span style="flex:1;font-size:12px;letter-spacing:.1em;white-space:nowrap;min-width:0">${listTitle}</span>
       <input id="${searchInputId}" type="text" placeholder="search…"
         oninput="filterMapsScroll('${searchInputId}','mapsScroll${idx}')"
         style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);
                font-family:var(--font-mono);font-size:11px;padding:3px 8px;
-               outline:none;width:100px;transition:border-color .2s;flex-shrink:0"
+               outline:none;width:72px;transition:border-color .2s;flex-shrink:0"
         onfocus="this.style.borderColor='${color}'" onblur="this.style.borderColor='var(--border2)'"/>
-      <button onclick="sortByRank(${idx})" title="Cycle sort: rank↑ → rank↓ → time↑ → time↓ → off"
-        style="background:transparent;
-               border:1px solid ${(()=>{const m=_sortRank[idx]||'none';return m!=='none'?color:'var(--border2)'})()};
-               color:${(()=>{const m=_sortRank[idx]||'none';return m!=='none'?color:'var(--text-dim)'})()};
-               font-family:var(--font-head);font-size:11px;letter-spacing:.08em;
-               padding:2px 8px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;
-               ${(()=>{const m=_sortRank[idx]||'none';return m!=='none'?`box-shadow:0 0 8px ${color}44;`:''})()}"
-        onmouseover="this.style.borderColor='${color}';this.style.color='${color}'"
-        onmouseout="this.style.borderColor='${(()=>{const m=_sortRank[idx]||'none';return m!=='none'?color:'var(--border2)'})()}';this.style.color='${(()=>{const m=_sortRank[idx]||'none';return m!=='none'?color:'var(--text-dim)'})()}'">
-        ${(()=>{
-          const m=_sortRank[idx]||'none';
-          if(m==='rank-asc')  return '↑ RANK ✓';
-          if(m==='rank-desc') return '↓ RANK ✓';
-          if(m==='time-asc')  return '↑ TIME ✓';
-          if(m==='time-desc') return '↓ TIME ✓';
-          return '⇅ SORT';
-        })()}
-      </button>
+      <select onchange="setSortMode(${idx}, this.value)"
+        style="background:var(--bg2);border:1px solid ${(_sortRank[idx]||'none')!=='none'?color:'var(--border2)'};
+               color:${(_sortRank[idx]||'none')!=='none'?color:'var(--text-dim)'};
+               font-family:var(--font-head);font-size:11px;letter-spacing:.06em;
+               padding:2px 6px;cursor:pointer;flex-shrink:0;outline:none;
+               ${(_sortRank[idx]||'none')!=='none'?`box-shadow:0 0 8px ${color}44;`:''}">
+        <option value="none"  ${(_sortRank[idx]||'none')==='none'     ?'selected':''}>⇅ SORT</option>
+        <option value="rank-asc"  ${(_sortRank[idx]||'')==='rank-asc' ?'selected':''}>↑ RANK</option>
+        <option value="rank-desc" ${(_sortRank[idx]||'')==='rank-desc'?'selected':''}>↓ RANK</option>
+        <option value="time-asc"  ${(_sortRank[idx]||'')==='time-asc' ?'selected':''}>↑ TIME</option>
+        <option value="time-desc" ${(_sortRank[idx]||'')==='time-desc'?'selected':''}>↓ TIME</option>
+      </select>
     </div>
     <div class="maps-col-header">
       <span class="map-idx" style="color:var(--border2)">#</span>
@@ -2197,6 +2196,11 @@ function sortByRank(pidx){
   if(window._lastResult) renderAll(window._lastResult);
 }
 
+function setSortMode(pidx, mode){
+  _sortRank[pidx] = mode;
+  if(window._lastResult) renderAll(window._lastResult);
+}
+
 function applySort(maps, pidx){
   const mode = _sortRank[pidx] || 'none';
   if(mode === 'none') return maps;
@@ -2247,11 +2251,23 @@ function buildPointsPanel(playerData){
   function getCumulativePoints(d){
     const mapsWithPts = (d.maps || []).filter(m => (m.points||0) > 0);
     if(!mapsWithPts.length) return [];
+    // API sorts by lastFinish desc — reverse = chronological oldest→newest
     const chrono = [...mapsWithPts].reverse();
     let cum = 0;
-    return chrono.map((m, i) => {
+    return chrono.map(m => {
       cum += m.points;
-      return { i: i+1, pts: cum, map: m.name, single: m.points };
+      // Parse lastFinish: could be unix ms, unix s, or ISO string
+      let ts = null;
+      if(m.lastFinish){
+        const raw = m.lastFinish;
+        if(typeof raw === 'number'){
+          ts = raw > 1e10 ? new Date(raw) : new Date(raw * 1000);
+        } else {
+          ts = new Date(raw);
+        }
+        if(isNaN(ts)) ts = null;
+      }
+      return { ts, pts: cum, map: m.name, single: m.points };
     });
   }
 
@@ -2274,10 +2290,26 @@ function buildPointsPanel(playerData){
     </div>`;
   }
 
-  const maxX = Math.max(...series.map(s => s.cumulative.length), 1);
+  // Check if we have valid dates for any series
+  const hasDates = series.some(s => s.cumulative.some(p => p.ts));
+
+  // Build a unified time domain if we have dates
+  let allTs = [];
+  if(hasDates){
+    series.forEach(s => s.cumulative.forEach(p => { if(p.ts) allTs.push(p.ts.getTime()); }));
+  }
+  const minTs = hasDates ? Math.min(...allTs) : 0;
+  const maxTs = hasDates ? Math.max(...allTs) : 0;
+  const tsRange = maxTs - minTs || 1;
+
+  // For x-axis: use timestamp if available, else use index
+  function getX(p, total, idx){
+    if(hasDates && p.ts) return (p.ts.getTime() - minTs) / tsRange;
+    return idx / total;
+  }
+
   const maxY = Math.max(...series.map(s => s.cumulative.length ? s.cumulative[s.cumulative.length-1].pts : 0), 1);
 
-  // Nice Y-axis ceiling: round up to nearest nice number
   function niceMax(v){
     const mag = Math.pow(10, Math.floor(Math.log10(v)));
     const norm = v / mag;
@@ -2287,13 +2319,12 @@ function buildPointsPanel(playerData){
   }
   const yMax = niceMax(maxY);
 
-  // SVG dimensions — large viewBox, responsive via CSS width:100%
   const W = 1100, H = 320;
-  const PAD = { t: 20, r: 90, b: 44, l: 64 };
+  const PAD = { t: 20, r: 90, b: 50, l: 64 };
   const chartW = W - PAD.l - PAD.r;
   const chartH = H - PAD.t - PAD.b;
 
-  function px(i){ return PAD.l + (i / maxX) * chartW; }
+  function px(ratio){ return PAD.l + ratio * chartW; }
   function py(v){ return PAD.t + chartH - (v / yMax) * chartH; }
 
   function fmtPts(v){
@@ -2302,7 +2333,11 @@ function buildPointsPanel(playerData){
     return String(v);
   }
 
-  // Grid + Y axis
+  function fmtDate(ts){
+    return new Date(ts).getFullYear().toString();
+  }
+
+  // Y grid
   const yTicks = 5;
   let grid = '', yLabels = '';
   for(let t = 0; t <= yTicks; t++){
@@ -2312,56 +2347,115 @@ function buildPointsPanel(playerData){
     yLabels += `<text x="${PAD.l-8}" y="${y.toFixed(1)}" dominant-baseline="middle" text-anchor="end" class="pts-axis-label">${fmtPts(v)}</text>`;
   }
 
-  // X axis ticks (6 evenly spaced)
+  // X axis ticks — one per unique year, with minimum pixel spacing to avoid overlap
   let xLabels = '';
-  const xSteps = Math.min(6, maxX);
-  for(let t = 0; t <= xSteps; t++){
-    const i = Math.round((maxX / xSteps) * t);
-    xLabels += `<text x="${px(i).toFixed(1)}" y="${PAD.t+chartH+18}" text-anchor="middle" class="pts-axis-label">${i}</text>`;
+  if(hasDates){
+    // Collect all unique years from data, map to their first occurrence ratio
+    const yearMap = new Map(); // year → earliest ratio
+    series.forEach(s => {
+      s.cumulative.forEach((p, i) => {
+        if(!p.ts) return;
+        const yr = p.ts.getFullYear();
+        const ratio = getX(p, s.cumulative.length, i);
+        if(!yearMap.has(yr) || ratio < yearMap.get(yr)) yearMap.set(yr, ratio);
+      });
+    });
+    // Add the start year at ratio 0
+    const startYear = new Date(minTs).getFullYear();
+    if(!yearMap.has(startYear)) yearMap.set(startYear, 0);
+
+    // Sort years and enforce min spacing (30px in viewBox coords = 30/chartW ratio)
+    const minSpacing = 35 / chartW;
+    const sortedYears = [...yearMap.entries()].sort((a,b) => a[1]-b[1]);
+    let lastPlacedRatio = -999;
+    sortedYears.forEach(([yr, ratio]) => {
+      if(ratio - lastPlacedRatio < minSpacing) return; // too close, skip
+      lastPlacedRatio = ratio;
+      const x = px(ratio);
+      // Dashed vertical line
+      xLabels += `<line x1="${x.toFixed(1)}" y1="${PAD.t}" x2="${x.toFixed(1)}" y2="${PAD.t+chartH}" stroke="rgba(255,255,255,.07)" stroke-width="1" stroke-dasharray="3,5"/>`;
+      xLabels += `<text x="${x.toFixed(1)}" y="${PAD.t+chartH+18}" text-anchor="middle" class="pts-axis-label">${yr}</text>`;
+    });
+  } else {
+    const maxX = Math.max(...series.map(s => s.cumulative.length), 1);
+    for(let t = 0; t <= 6; t++){
+      const i = Math.round((maxX / 6) * t);
+      xLabels += `<text x="${px(i/maxX).toFixed(1)}" y="${PAD.t+chartH+18}" text-anchor="middle" class="pts-axis-label">${i}</text>`;
+    }
   }
 
-  // Chart border
-  let svgBody = `<rect x="${PAD.l}" y="${PAD.t}" width="${chartW}" height="${chartH}" fill="rgba(0,0,0,.2)" rx="2"/>`;
+  // Chart frame
+  let svgBody = `<rect x="${PAD.l}" y="${PAD.t}" width="${chartW}" height="${chartH}" fill="rgba(0,0,0,.25)" rx="3"/>`;
   svgBody += grid;
-  svgBody += `<line x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${PAD.t+chartH}" stroke="rgba(255,255,255,.1)" stroke-width="1"/>`;
-  svgBody += `<line x1="${PAD.l}" y1="${PAD.t+chartH}" x2="${PAD.l+chartW}" y2="${PAD.t+chartH}" stroke="rgba(255,255,255,.1)" stroke-width="1"/>`;
+  svgBody += `<line x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${PAD.t+chartH}" stroke="rgba(255,255,255,.12)" stroke-width="1"/>`;
+  svgBody += `<line x1="${PAD.l}" y1="${PAD.t+chartH}" x2="${PAD.l+chartW}" y2="${PAD.t+chartH}" stroke="rgba(255,255,255,.12)" stroke-width="1"/>`;
   svgBody += yLabels + xLabels;
-  svgBody += `<text x="${PAD.l + chartW/2}" y="${H - 4}" text-anchor="middle" class="pts-axis-label" style="font-size:10px">maps completed (chronological order)</text>`;
+  const xAxisLabel = hasDates ? 'date of completion' : 'maps completed (chronological order)';
+  svgBody += `<text x="${PAD.l + chartW/2}" y="${H - 4}" text-anchor="middle" class="pts-axis-label" style="font-size:10px">${xAxisLabel}</text>`;
 
-  // Lines per player
-  series.forEach(s => {
-    if(!s.cumulative.length) return;
-    const last = s.cumulative[s.cumulative.length - 1];
+  // Lines per player — draw areas first, then lines on top
+  const seriesWithData = series.filter(s => s.cumulative.length > 0);
 
-    // Area
-    const areaD = `M${px(0).toFixed(1)},${py(0).toFixed(1)} `
-      + s.cumulative.map(p => `L${px(p.i).toFixed(1)},${py(p.pts).toFixed(1)}`).join(' ')
-      + ` L${px(last.i).toFixed(1)},${py(0).toFixed(1)} Z`;
-    svgBody += `<path d="${areaD}" fill="${s.color}" fill-opacity="0.08"/>`;
+  // Pass 1: areas (behind everything)
+  seriesWithData.forEach(s => {
+    const total = s.cumulative.length;
+    const last  = s.cumulative[total - 1];
+    const lastR = getX(last, total, total - 1);
+    const firstR = getX(s.cumulative[0], total, 0);
+    const areaD = `M${px(firstR).toFixed(1)},${py(0).toFixed(1)} `
+      + s.cumulative.map((p,i)=>{ const r=getX(p,total,i); return `L${px(r).toFixed(1)},${py(p.pts).toFixed(1)}`; }).join(' ')
+      + ` L${px(lastR).toFixed(1)},${py(0).toFixed(1)} Z`;
+    svgBody += `<path d="${areaD}" fill="${s.color}" fill-opacity="0.07"/>`;
+  });
 
-    // Line
-    const lineD = `M${px(s.cumulative[0].i).toFixed(1)},${py(s.cumulative[0].pts).toFixed(1)} `
-      + s.cumulative.slice(1).map(p => `L${px(p.i).toFixed(1)},${py(p.pts).toFixed(1)}`).join(' ');
-    svgBody += `<path d="${lineD}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 5px ${s.color}99)"/>`;
+  // Pass 2: lines + dots
+  // Collect end-label positions to avoid overlap
+  const endLabels = [];
+  seriesWithData.forEach(s => {
+    const total = s.cumulative.length;
+    const last  = s.cumulative[total - 1];
+    const lastR = getX(last, total, total - 1);
 
-    // End dot
-    const ex = px(last.i), ey = py(last.pts);
-    svgBody += `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="5" fill="${s.color}" stroke="var(--bg)" stroke-width="2" style="filter:drop-shadow(0 0 8px ${s.color})"/>`;
+    // Smooth line using polyline (enough points for smooth appearance)
+    const pts = s.cumulative.map((p,i)=>{
+      const r = getX(p,total,i);
+      return `${px(r).toFixed(1)},${py(p.pts).toFixed(1)}`;
+    }).join(' ');
+    svgBody += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round"
+      style="filter:drop-shadow(0 0 4px ${s.color}88)"/>`;
 
-    // Right-side label (inside right padding)
-    const labelY = Math.max(PAD.t + 8, Math.min(PAD.t + chartH - 4, ey));
-    svgBody += `<text x="${PAD.l + chartW + 8}" y="${labelY.toFixed(1)}" dominant-baseline="middle"
-      style="font-family:var(--font-head);font-size:11px;fill:${s.color};font-weight:700">${fmtPts(last.pts)}</text>`;
+    // End dot with glow
+    const ex = px(lastR), ey = py(last.pts);
+    svgBody += `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="6" fill="${s.color}" opacity="0.25"/>`;
+    svgBody += `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="4" fill="${s.color}" stroke="#0a0f18" stroke-width="1.5" style="filter:drop-shadow(0 0 8px ${s.color})"/>`;
+
+    endLabels.push({ color: s.color, pts: last.pts, ey, label: fmtPts(last.pts) });
+  });
+
+  // Anti-overlap for right-side labels: sort by ey, push apart by min 14px
+  endLabels.sort((a,b) => a.ey - b.ey);
+  const minLabelGap = 14;
+  for(let i = 1; i < endLabels.length; i++){
+    if(endLabels[i].ey - endLabels[i-1].ey < minLabelGap){
+      endLabels[i].ey = endLabels[i-1].ey + minLabelGap;
+    }
+  }
+  endLabels.forEach(el => {
+    const lx = PAD.l + chartW + 8;
+    const ly = Math.max(PAD.t + 6, Math.min(PAD.t + chartH, el.ey));
+    svgBody += `<text x="${lx}" y="${ly.toFixed(1)}" dominant-baseline="middle"
+      style="font-family:var(--font-head);font-size:11px;fill:${el.color};font-weight:700">${el.label}</text>`;
   });
 
   const svgHtml = `<svg class="pts-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"
     style="width:100%;height:auto;min-height:180px;max-height:340px;display:block">${svgBody}</svg>`;
 
-  // Totals row
+  // Totals row — bigger names
   const totalsHtml = series.map(s => `
     <div class="pts-total-cell">
       <div class="pts-total-val" style="color:${s.color};text-shadow:0 0 20px ${s.color}66">${s.totalPts.toLocaleString()}</div>
-      <div style="font-size:9px;color:${s.color};font-family:var(--font-head);letter-spacing:.08em;opacity:.8;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}</div>
+      <div style="font-size:13px;color:${s.color};font-family:var(--font-head);letter-spacing:.06em;font-weight:700;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}</div>
       <div class="pts-total-lbl">TOTAL PTS</div>
     </div>`).join('');
 
@@ -2377,7 +2471,7 @@ function buildPointsPanel(playerData){
     <div class="pts-panel-header">
       <span class="badge" style="background:#fde047;color:#000">★</span>
       POINTS PROGRESSION
-      <span style="font-size:11px;color:var(--text-dim);margin-left:4px">— cumulative points as maps completed</span>
+      <span style="font-size:11px;color:var(--text-dim);margin-left:4px">— cumulative points${hasDates ? ' over time' : ' as maps completed'}</span>
     </div>
     <div class="pts-total-row">${totalsHtml}</div>
     <div class="pts-chart-wrap" style="padding:16px 20px 12px">${svgHtml}</div>
