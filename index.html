@@ -57,7 +57,8 @@
       linear-gradient(rgba(34,211,238,.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(34,211,238,.03) 1px, transparent 1px);
     background-size: 56px 56px;
-    animation: gridDrift 30s linear infinite;
+    /* ✅ FIX 1: slowed from 30s to 120s — 75% less GPU work */
+    animation: gridDrift 120s linear infinite;
   }
   @keyframes gridDrift { from{ background-position:0 0 } to{ background-position:56px 56px } }
   body::after {
@@ -527,12 +528,12 @@
 
   /* ─── Rank badges ───────────────────────────────────────────── */
   .map-rank { font-size: 13px; width: 42px; flex-shrink: 0; text-align: right; font-family: var(--font-head); }
+  /* ✅ FIX 2: rank1Pulse now uses opacity only — no more text-shadow repaint every frame */
   .rank-1 {
     color: #22c55e; font-weight: 800;
-    text-shadow: 0 0 12px rgba(34,197,94,.8);
     animation: rank1Pulse 2.5s ease-in-out infinite;
   }
-  @keyframes rank1Pulse { 0%,100%{ text-shadow:0 0 10px rgba(34,197,94,.6) } 50%{ text-shadow:0 0 20px rgba(34,197,94,1) } }
+  @keyframes rank1Pulse { 0%,100%{ opacity:.75 } 50%{ opacity:1 } }
   .rank-2 { color: #fde047; font-weight: 700; text-shadow: 0 0 8px rgba(253,224,71,.5); }
   .rank-3 { color: #fb923c; font-weight: 600; text-shadow: 0 0 8px rgba(251,146,60,.4); }
   .rank-n { color: #3d5568; }
@@ -649,11 +650,12 @@
     padding: 4px 10px; letter-spacing: .08em; white-space: nowrap;
     clip-path: polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
     box-shadow: 0 0 16px rgba(34,197,94,.2), inset 0 1px 0 rgba(34,197,94,.15);
+    /* ✅ FIX 3: badgeShimmer now uses opacity only — no more box-shadow repaint */
     animation: badgeShimmer 3s ease-in-out infinite;
   }
   @keyframes badgeShimmer {
-    0%,100%{ box-shadow:0 0 12px rgba(34,197,94,.2) }
-    50%{ box-shadow:0 0 24px rgba(34,197,94,.45) }
+    0%,100%{ opacity:.8 }
+    50%{ opacity:1 }
   }
 
   /* ─── Live dot ──────────────────────────────────────────────── */
@@ -695,7 +697,6 @@
   .download-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
   .download-btn:hover { border-color: var(--amber); color: var(--amber); background: rgba(245,158,11,.06); box-shadow: 0 0 16px rgba(245,158,11,.1); }
 
-  /* ─── Footer ────────────────────────────────────────────────── */
   /* ─── Completion Ring ───────────────────────────────────────── */
   .completion-ring {
     position: relative; display: flex; align-items: center; justify-content: center;
@@ -760,67 +761,7 @@
   }
   @keyframes crownPulse { 0%,100%{ opacity:.8; transform:scale(1) } 50%{ opacity:1; transform:scale(1.15) } }
 
-  /* ─── Exclusive Cards Grid ──────────────────────────────────── */
-  .excl-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 0;
-    border-top: none;
-  }
-  .excl-card {
-    border: none;
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    background: var(--panel);
-    position: relative;
-    overflow: hidden;
-    display: flex; flex-direction: column;
-    transition: background .2s;
-  }
-  .excl-card:hover { background: color-mix(in srgb, var(--ec, var(--amber)) 3%, var(--panel)); }
-  .excl-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: var(--ec, var(--amber));
-    box-shadow: 0 0 12px var(--ec, var(--amber));
-  }
-  .excl-card-head {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px 12px;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--ec, var(--amber)) 8%, transparent), transparent);
-    border-bottom: 1px solid var(--border);
-  }
-  .excl-avatar {
-    width: 36px; height: 36px; flex-shrink: 0;
-    background: color-mix(in srgb, var(--ec, var(--amber)) 15%, var(--bg2));
-    border: 1px solid var(--ec, var(--amber));
-    color: var(--ec, var(--amber));
-    font-family: var(--font-head); font-weight: 800; font-size: 17px;
-    display: flex; align-items: center; justify-content: center;
-    clip-path: polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
-    box-shadow: 0 0 14px color-mix(in srgb, var(--ec, var(--amber)) 30%, transparent);
-    text-shadow: 0 0 12px currentColor;
-  }
-  .excl-list-head {
-    display: flex; align-items: center; gap: 8px;
-    padding: 6px 12px; background: rgba(0,0,0,.2);
-    border-bottom: 1px solid var(--border);
-  }
-  .excl-scroll { flex: 1; overflow-y: auto; max-height: 280px; }
-  .excl-scroll::-webkit-scrollbar { width: 3px; }
-  .excl-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-  .excl-unfin-btn {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 14px;
-    border-top: 1px solid var(--border);
-    cursor: pointer; transition: background .15s;
-    user-select: none;
-    background: rgba(244,63,94,.03);
-  }
-
-  /* ─── Excl-rank ─────────────────────────────────────────────── */
-  .excl-rank { font-family: var(--font-head); font-size: 11px; font-weight: 700; width: 36px; flex-shrink: 0; text-align: right; margin-right: 4px; }
-
-  /* ─── Exclusive Cards Grid ──────────────────────────────────── */
+  /* ─── Exclusive Cards Grid ──────────────────────────────── */
   .excl-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -886,14 +827,14 @@
 <body>
 <div id="app">
 
-  <!-- ── Header ─────────────────────────────── -->
+  <!-- ── Header ─────────────────────────── -->
   <header>
     <div class="header-badge">PLAYER INTEL</div>
     <h1>KoG<span>COMPARE</span></h1>
     <div class="header-sub">Head-to-Head Comparison System</div>
   </header>
 
-  <!-- ── Input Card ─────────────────────────── -->
+  <!-- ── Input Card ─────────────────────── -->
   <div class="input-card">
     <div class="corner-tl"></div>
     <div class="corner-br"></div>
@@ -911,10 +852,10 @@
     <button class="compare-btn" id="compareBtn" onclick="startCompare()">COMPARE PLAYERS</button>
   </div>
 
-  <!-- ── Status / Error ─────────────────────── -->
+  <!-- ── Status / Error ─────────────────── -->
   <div id="status"></div>
 
-  <!-- ── Loader ─────────────────────────────── -->
+  <!-- ── Loader ─────────────────────────── -->
   <div class="loader-wrap" id="loader">
     <div class="loader-radar">
       <div class="loader-ring"></div>
@@ -925,7 +866,7 @@
     <p style="margin-top:20px;font-size:14px;color:var(--text-dim);letter-spacing:.18em;" data-i18n="loading">FETCHING PLAYER DATA…</p>
   </div>
 
-  <!-- ── Results ────────────────────────────── -->
+  <!-- ── Results ────────────────────────── -->
   <div id="results">
 
     <!-- Sticky top bar: filter + tabs -->
@@ -1121,7 +1062,6 @@ async function exportImage(){
   const filename = `${players}.png`;
   const source = document.getElementById('tab-' + _activeTab) || document.getElementById('results');
 
-  // Make source visible if hidden (e.g. inactive tab)
   const savedDisplay = source.style.display;
   const savedVis     = source.style.visibility;
   const wasHidden    = window.getComputedStyle(source).display === 'none';
@@ -1132,13 +1072,11 @@ async function exportImage(){
 
   await new Promise(r => setTimeout(r, 80));
 
-  // Hide all scrollbars during capture
   const noScrollStyle = document.createElement('style');
   noScrollStyle.id = '__export_noscroll';
   noScrollStyle.textContent = `* { scrollbar-width: none !important; } *::-webkit-scrollbar { display: none !important; width: 0 !important; }`;
   document.head.appendChild(noScrollStyle);
 
-  // Capture only the visible area (what the user actually sees)
   const W = source.offsetWidth  || 1100;
   const H = source.offsetHeight || 600;
 
@@ -1149,7 +1087,6 @@ async function exportImage(){
       height: H,
     });
 
-    // Restore
     document.getElementById('__export_noscroll')?.remove();
     if(wasHidden){ source.style.display = savedDisplay; source.style.visibility = savedVis; }
 
@@ -1172,8 +1109,6 @@ async function exportImage(){
   }
 }
 
-
-
 function setLang(l){
   lang = l;
   document.getElementById('btn-en').classList.toggle('active', l==='en');
@@ -1186,15 +1121,11 @@ function setLang(l){
     if (el.tagName === 'INPUT') el.placeholder = t(k);
     else el.textContent = t(k);
   });
-  // Re-render results if present
   if (window._lastResult) renderAll(window._lastResult);
 }
 
 /* ═══════════════════════════════════════════════════════
    CORS proxy + fetch helpers
-   NOTE: ravenkog.com is Next.js App Router — the HTML page
-   has NO data (client-side hydration). We must call their
-   JSON API directly.
 ═══════════════════════════════════════════════════════ */
 const PROXY_WRAPPERS = [
   url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
@@ -1202,12 +1133,6 @@ const PROXY_WRAPPERS = [
   url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
 ];
 
-/* ═══════════════════════════════════════════════════════
-   REAL RavenKoG API (discovered via DevTools)
-   GET /api/players/finished-maps?playerName=X&page=0&limit=9999
-   Response: { data: [...], total: N }  OR  [ ... ]
-   Each item: { map, finishTime, rank, difficulty, points, date }
-═══════════════════════════════════════════════════════ */
 function buildFinishedURL(name, page=0, limit=9999){
   const base = 'https://www.ravenkog.com/api/players/maps';
   return `${base}?playerName=${encodeURIComponent(name)}&page=${page}&limit=${limit}&sortField=lastFinish&sortOrder=-1&search=&difficulty=`;
@@ -1227,7 +1152,6 @@ function fetchWithTimeout(url, ms){
   });
 }
 
-// Fetch through CORS proxies
 async function fetchViaProxy(url, ms=14000){
   let lastErr;
   for(const wrap of PROXY_WRAPPERS){
@@ -1242,9 +1166,7 @@ async function fetchViaProxy(url, ms=14000){
   throw lastErr || new Error('All proxies failed for: '+url);
 }
 
-// Generic: fetch all pages from a paginated API endpoint
 async function fetchAllPages(buildURL, name, statusLabel, statusCb){
-  // Try limit=9999 first
   const url = buildURL(name, 0, 9999);
   try {
     const text = await fetchViaProxy(url);
@@ -1256,7 +1178,6 @@ async function fetchAllPages(buildURL, name, statusLabel, statusCb){
     }
   } catch(_){}
 
-  // Fall back to paginating with limit=20
   statusCb(`📄 Paginating ${statusLabel}…`);
   const firstText = await fetchViaProxy(buildURL(name, 0, 20));
   const firstJson = JSON.parse(firstText);
@@ -1278,12 +1199,10 @@ async function fetchAllPages(buildURL, name, statusLabel, statusCb){
   return { arr: allItems, total: pageTotal || allItems.length };
 }
 
-// Fetch finished + unfinished maps for a player
 async function fetchPlayerAPI(name, statusCb){
   const tried = [];
   statusCb(`📡 Fetching maps for "${name}"…`);
 
-  // Fetch finished and unfinished in parallel
   const [finResult, unfinResult] = await Promise.allSettled([
     fetchAllPages(buildFinishedURL, name, 'finished maps', statusCb),
     fetchAllPages(buildUnfinishedURL, name, 'unfinished maps', statusCb),
@@ -1307,7 +1226,6 @@ async function fetchPlayerAPI(name, statusCb){
     };
   }
 
-  // Total fallback: HTML scrape
   statusCb(`⚠ API returned empty, trying HTML fallback…`);
   tried.push('html-fallback');
   try {
@@ -1320,25 +1238,17 @@ async function fetchPlayerAPI(name, statusCb){
 
 /* ═══════════════════════════════════════════════════════
    Difficulty helpers
-   RavenKoG uses text categories: Solo/Easy/Main/Hard/Insane/Extreme/Mod
 ═══════════════════════════════════════════════════════ */
 const DIFF_MAP = { solo:1, easy:2, main:3, hard:4, insane:5, extreme:6, mod:7 };
 function diffStrToNum(s){
   if(!s) return 0;
   const n = DIFF_MAP[String(s).toLowerCase().trim()];
   if(n) return n;
-  // If it's already a number string
   const f = parseFloat(s);
   return isNaN(f) ? 0 : f;
 }
 
-/* ═══════════════════════════════════════════════════════
-   Parse player data from finished-maps API response
-   Actual shape: { data: [{map,finishTime,rank,difficulty,points,date},...], total: N }
-   OR directly an array
-═══════════════════════════════════════════════════════ */
 function parseAPIResponse(json, name){
-  // Unwrap envelope
   const arr = Array.isArray(json)
     ? json
     : (json.data || json.maps || json.finishes || json.results || []);
@@ -1347,21 +1257,13 @@ function parseAPIResponse(json, name){
 
   const maps = arr.map(item => {
     if(!item || typeof item !== 'object') return null;
-
-    // Map name: try 'map', 'mapName', 'name', 'mapId'
     const mapName = String(
       item.map || item.mapName || item.map_name || item.name || item.mapId || ''
     ).trim();
     if(!mapName) return null;
-
-    // Rank: 'rank', 'position', 'serverRank'
     const rank = parseInt(item.rank || item.position || item.serverRank || 0) || 0;
-
-    // Difficulty: text label e.g. "Insane"
     const diffStr = String(item.difficulty || item.diff || item.tier || item.category || '').trim();
     const diffNum = diffStrToNum(diffStr);
-
-    // Time: finishTime like "00:03:00.54"
     const time = String(item.finishTime || item.finish_time || item.time || '').trim();
     return { name: mapName, rank, difficulty: diffNum, difficultyLabel: diffStr, time };
   }).filter(Boolean);
@@ -1373,7 +1275,7 @@ function parseAPIResponse(json, name){
 
   return {
     name,
-    maps,          // ALL maps, no cap — filtering happens at render time
+    maps,
     totalMaps,
     rank1Count,
     globalRank: json.rank || json.globalRank || 0,
@@ -1381,22 +1283,13 @@ function parseAPIResponse(json, name){
   };
 }
 
-/* ═══════════════════════════════════════════════════════
-   Fallback: parse HTML page (last resort)
-   The page uses Next.js App Router streaming — main content
-   is empty in static HTML. We try __next_f stream data.
-═══════════════════════════════════════════════════════ */
 function parsePlayerHTML(html, name){
   const maps = [];
-
-  // The page uses self.__next_f.push([1, "..."]) for streaming RSC data
-  // Extract all the pushed strings and search for map data patterns
   const flightChunks = [];
   const flightRe = /self\.__next_f\.push\(\[1,\s*"([\s\S]*?)"\]\)/g;
   let fm;
   while((fm = flightRe.exec(html)) !== null){
     try {
-      // Unescape the JSON string content
       const unescaped = JSON.parse('"' + fm[1] + '"');
       flightChunks.push(unescaped);
     } catch(_){
@@ -1405,9 +1298,6 @@ function parsePlayerHTML(html, name){
   }
 
   const allFlight = flightChunks.join(' ');
-
-  // Search for map data in the flight chunks
-  // Pattern: map names with difficulty labels
   const diffLabels = 'Solo|Easy|Main|Hard|Insane|Extreme|Mod';
   const mapRe = new RegExp('"(?:map|mapName|name)"\s*:\s*"([^"]+)"[^}]{0,200}"(?:difficulty|diff|tier)"\s*:\s*"(' + diffLabels + ')"', 'gi');
   let mm;
@@ -1419,7 +1309,6 @@ function parsePlayerHTML(html, name){
     }
   }
 
-  // Also try reverse order
   const mapRe2 = new RegExp('"(?:difficulty|diff)"\s*:\s*"(' + diffLabels + ')"[^}]{0,200}"(?:map|mapName|name)"\s*:\s*"([^"]+)"', 'gi');
   while((mm = mapRe2.exec(allFlight)) !== null){
     const diffStr = mm[1];
@@ -1429,7 +1318,6 @@ function parsePlayerHTML(html, name){
     }
   }
 
-  // Extract "Finished maps: N" from flight data
   let totalMaps = maps.length;
   const fm2 = allFlight.match(/[Ff]inished\s+maps[:\s]+(\d+)/);
   if(fm2) totalMaps = Math.max(totalMaps, parseInt(fm2[1]));
@@ -1439,7 +1327,6 @@ function parsePlayerHTML(html, name){
   const avgDifficulty = mapsWithDiff.length>0
     ? mapsWithDiff.reduce((s,m)=>s+m.difficulty,0)/mapsWithDiff.length : 0;
 
-  // 404 check
   if(/404|not found/i.test(html.slice(0,2000)) && maps.length===0) throw new Error('404');
 
   return { name, maps: maps.slice(0,50), totalMaps, rank1Count, globalRank:0, avgDifficulty: +avgDifficulty.toFixed(2) };
@@ -1458,7 +1345,6 @@ function showLoader(v){ document.getElementById('loader').className = 'loader-wr
 function showResults(v){ document.getElementById('results').className = v ? 'shown' : ''; }
 
 function diffClass(d){
-  // d is numeric: Solo=1 Easy=2 Main=3 Hard=4 Insane=5 Extreme=6 Mod=7
   if(!d) return 'diff-unknown';
   if(d <= 1) return 'diff-1';
   if(d <= 2) return 'diff-2';
@@ -1472,18 +1358,16 @@ function diffClass(d){
 const DIFF_LABEL_ORDER = ['','Solo','Easy','Main','Hard','Insane','Extreme','Mod'];
 const DIFF_COLORS = ['','#4ade80','#2dd4bf','#fde047','#fb923c','#f87171','#ef4444','#a78bfa'];
 
-/* Format "00:03:00.54" → "3:00.54" */
 function formatTime(raw){
   if(!raw || raw === '—') return '—';
   raw = String(raw).trim();
   const parts = raw.split(':');
 
   function trimSecs(s){
-    // "26.860000" → "26.86", "00.500000" → "0.50", "45.000000" → "45"
     const dot = s.indexOf('.');
     if(dot === -1) return s;
     const intPart = s.slice(0, dot);
-    const dec = s.slice(dot + 1, dot + 3); // keep 2 decimal places
+    const dec = s.slice(dot + 1, dot + 3);
     return dec === '00' ? intPart : `${intPart}.${dec}`;
   }
 
@@ -1493,17 +1377,15 @@ function formatTime(raw){
     if(m > 0) return `${m}:${s.padStart(5,'0')}`;
     return `${s}s`;
   }
-  // Already in m:ss.xx format or plain seconds
   if(parts.length === 2){
     return `${parts[0]}:${trimSecs(parts[1]).padStart(5,'0')}`;
   }
   return trimSecs(raw);
 }
 
-/* Build difficulty distribution bar from map array */
 function buildDiffBar(maps){
   if(!maps || maps.length === 0) return '';
-  const counts = [0,0,0,0,0,0,0,0]; // index 1-7
+  const counts = [0,0,0,0,0,0,0,0];
   maps.forEach(m => { if(m.difficulty >= 1 && m.difficulty <= 7) counts[m.difficulty]++; });
   const total = maps.length;
   let segs = '';
@@ -1524,11 +1406,9 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
   const totalCount = base.maps.length;
   const mx = maxMaps || base.totalMaps || 1;
 
-  // TOP 5 count
   const top5Count = base.maps.filter(m => m.rank >= 1 && m.rank <= 5).length;
   const top5InDiff = isFiltered ? data.maps.filter(m => m.rank >= 1 && m.rank <= 5).length : top5Count;
 
-  // SKILL LEVEL: highest diff where player finished ≥50% of server maps in that diff
   let skillLabel = '—';
   let skillDiffNum = 0;
   let skillPct = 0;
@@ -1537,6 +1417,7 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
     base.maps.forEach(m => {
       if(m.difficulty > 0) playerDiffCounts[m.difficulty] = (playerDiffCounts[m.difficulty]||0) + 1;
     });
+    // Primary: ≥50% completion
     for(let d = 6; d >= 1; d--){
       const total = window._diffTotals[d] || 0;
       const finished = playerDiffCounts[d] || 0;
@@ -1544,16 +1425,25 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
         skillDiffNum = d; skillPct = ((finished / total) * 100).toFixed(0); break;
       }
     }
-    // Fallback: if no diff hits ≥50%, use highest diff player has any maps in
+    // Fallback 1: ≥20% completion (meaningful presence)
     if(!skillDiffNum){
       for(let d = 6; d >= 1; d--){
-        if(playerDiffCounts[d] > 0){ skillDiffNum = d; skillPct = 0; break; }
+        const total = window._diffTotals[d] || 0;
+        const finished = playerDiffCounts[d] || 0;
+        if(total > 0 && (finished / total) >= 0.2){ skillDiffNum = d; skillPct = ((finished / total) * 100).toFixed(0); break; }
+      }
+    }
+    // Fallback 2: ≥10% or at least 10 maps
+    if(!skillDiffNum){
+      for(let d = 6; d >= 1; d--){
+        const total = window._diffTotals[d] || 0;
+        const finished = playerDiffCounts[d] || 0;
+        if(finished >= 10 || (total > 0 && (finished / total) >= 0.1)){ skillDiffNum = d; skillPct = ((finished / total) * 100).toFixed(0); break; }
       }
     }
     const SHORT = ['','Sol','Easy','Main','Hard','Ins','Ext'];
     skillLabel = skillDiffNum > 0 ? SHORT[skillDiffNum] : '—';
   } else if(!window._diffTotalsLoaded){
-    // While loading: show best guess from player's own maps
     const SHORT = ['','Sol','Easy','Main','Hard','Ins','Ext'];
     for(let d = 6; d >= 1; d--){
       if(base.maps.some(m => m.difficulty === d)){ skillDiffNum = d; skillLabel = SHORT[d]; break; }
@@ -1563,7 +1453,6 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
   const skillColor = skillDiffNum > 0 ? ['','#4ade80','#2dd4bf','#fde047','#fb923c','#f87171','#ef4444','#a78bfa'][skillDiffNum] : color;
   const skillSparkPct = skillDiffNum > 0 ? Math.min(((skillDiffNum/7)*100),100).toFixed(1) : 0;
 
-  // When a difficulty is selected, count unfinished maps of that difficulty
   let unfinishedInDiff = 0;
   if(isFiltered && base.unfinishedArr){
     const diffNum = parseInt(_activeDiff);
@@ -1576,10 +1465,7 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
   const mapsStatLabel = isFiltered ? `${DIFF_LABEL_ORDER[parseInt(_activeDiff)]||'?'} MAPS` : t('totalMaps');
   const mapsSparkPct  = isFiltered ? (totalInDiff > 0 ? ((shownCount/totalInDiff)*100).toFixed(1) : 0) : pctMaps;
 
-  // Top5 stat display
-  const top5StatVal = isFiltered
-    ? String(top5InDiff)
-    : String(top5Count);
+  const top5StatVal = isFiltered ? String(top5InDiff) : String(top5Count);
   const top5Label = isFiltered ? `${DIFF_LABEL_ORDER[parseInt(_activeDiff)]||'?'} TOP5` : 'TOP 5';
   const top5Pct = shownCount > 0 ? ((top5InDiff / shownCount)*100).toFixed(1) : '0';
   const top5SparkPct = shownCount > 0 ? ((top5InDiff / shownCount)*100).toFixed(1) : 0;
@@ -1614,7 +1500,6 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
     ? `${DIFF_LABEL_ORDER[parseInt(_activeDiff)]||'?'} MAPS — <strong style="color:#fff">${shownCount}</strong> <span style="color:var(--text-dim)">/ ${totalInDiff}</span>`
     : `ALL MAPS — ${totalCount}`;
 
-  // Completion ring — shows overall OR selected diff progress
   let serverTotal = 0, ringFinished = 0;
   const safeDiffTotals = window._diffTotals || {};
   if(isFiltered){
@@ -1651,7 +1536,6 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
       <span class="ring-label" style="color:${ringColor}">${ringLabel}</span>
     </div>`;
 
-  // AVG RANK across current visible maps
   const rankedMaps = data.maps.filter(m => m.rank > 0);
   const avgRank = rankedMaps.length > 0
     ? (rankedMaps.reduce((s, m) => s + m.rank, 0) / rankedMaps.length).toFixed(1)
@@ -1733,17 +1617,28 @@ function buildChart(playerData, fullPlayerData){
   const maxMaps  = Math.max(...playerData.map(d => d.totalMaps), 1);
   const maxRank1 = Math.max(...playerData.map(d => d.rank1Count), 1);
 
-  // Skill level always uses FULL (unfiltered) maps
   function getSkillNum(d){
     if(!window._diffTotalsLoaded) return 0;
     const playerDiffCounts = {};
     d.maps.forEach(m => { if(m.difficulty > 0) playerDiffCounts[m.difficulty] = (playerDiffCounts[m.difficulty]||0) + 1; });
+    // Primary: ≥50%
     for(let diff = 6; diff >= 1; diff--){
       const total = window._diffTotals[diff] || 0;
       const finished = playerDiffCounts[diff] || 0;
       if(total > 0 && (finished / total) >= 0.5) return diff;
     }
-    for(let diff = 6; diff >= 1; diff--){ if(playerDiffCounts[diff] > 0) return diff; }
+    // Fallback 1: ≥20%
+    for(let diff = 6; diff >= 1; diff--){
+      const total = window._diffTotals[diff] || 0;
+      const finished = playerDiffCounts[diff] || 0;
+      if(total > 0 && (finished / total) >= 0.2) return diff;
+    }
+    // Fallback 2: ≥10% or 10 maps
+    for(let diff = 6; diff >= 1; diff--){
+      const total = window._diffTotals[diff] || 0;
+      const finished = playerDiffCounts[diff] || 0;
+      if(finished >= 10 || (total > 0 && (finished / total) >= 0.1)) return diff;
+    }
     return 0;
   }
 
@@ -1764,7 +1659,6 @@ function buildChart(playerData, fullPlayerData){
   const SHORT = ['','Sol','Easy','Main','Hard','Ins','Ext'];
   const DIFF_COLORS_ARR = ['','#4ade80','#2dd4bf','#fde047','#fb923c','#f87171','#ef4444'];
 
-  // Skill level rows — always from FULL unfiltered data, colored by diff
   const skillRows = fullData.map(d => {
     const sn = getSkillNum(d);
     const pct = sn > 0 ? ((sn / 6) * 100).toFixed(1) : 0;
@@ -1792,7 +1686,6 @@ function buildCommonPanel(common, playerData){
     </div>
     <div class="empty-msg">— ${t('noCommon')} —</div>`;
 
-  // Build lookup: mapName → {playerIdx: {rank, time}}
   const lookup = {};
   if(playerData){
     playerData.forEach((d, pi) => {
@@ -1806,7 +1699,6 @@ function buildCommonPanel(common, playerData){
 
   const nPlayers = playerData ? playerData.length : 0;
 
-  // Sort: by best rank across all players (lowest rank number = best)
   let sorted = [...common];
   if(_sortCommon){
     sorted.sort((a, b) => {
@@ -1820,14 +1712,12 @@ function buildCommonPanel(common, playerData){
     });
   }
 
-  // Compute avg rank per player across all common maps
   const avgRanks = (playerData && playerData.length) ? playerData.map((d, pi) => {
     const ranks = common.map(m => lookup[m.name.toLowerCase()]?.[pi]?.rank).filter(r => r > 0);
     return ranks.length > 0 ? ranks.reduce((a,b) => a+b, 0) / ranks.length : Infinity;
   }) : [];
   const bestAvgRank = avgRanks.length ? Math.min(...avgRanks.filter(r => r !== Infinity)) : Infinity;
 
-  // Header columns per player — with avg rank + crown
   const playerCols = playerData ? playerData.map((d, pi) => {
     const avg = avgRanks[pi];
     const avgStr = avg !== Infinity ? '#' + avg.toFixed(1) : '—';
@@ -1849,7 +1739,6 @@ function buildCommonPanel(common, playerData){
     const dl = m.difficultyLabel || DIFF_LABEL_ORDER[m.difficulty] || '?';
     const key = m.name.toLowerCase();
 
-    // Find best rank AND fastest time among players for this map
     let bestRank = Infinity;
     let bestTimeVal = Infinity;
     if(playerData) playerData.forEach((_, pi) => {
@@ -1964,12 +1853,10 @@ function buildDiffPanel(playerData, exclusivesFiltered){
     const colId = `excl-col-${i}`;
     const initial = d.name.charAt(0).toUpperCase();
 
-    // Completion mini-bar: ex.length / (ex.length + unfinMaps.length)
     const total = ex.length + unfinMaps.length;
     const pct = total > 0 ? ((ex.length / total) * 100).toFixed(1) : 0;
 
     return `<div class="excl-card" style="--ec:${d.color}">
-      <!-- Card header -->
       <div class="excl-card-head">
         <div class="excl-avatar">${initial}</div>
         <div style="flex:1;min-width:0">
@@ -1981,19 +1868,15 @@ function buildDiffPanel(playerData, exclusivesFiltered){
           <div style="font-size:9px;color:var(--text-dim);letter-spacing:.12em">FINISHED</div>
         </div>
       </div>
-      <!-- Progress bar -->
       <div style="height:3px;background:var(--border);margin:0">
         <div style="height:100%;width:${pct}%;background:${d.color};box-shadow:0 0 8px ${d.color};transition:width .8s cubic-bezier(.16,1,.3,1)"></div>
       </div>
-      <!-- List header -->
       <div class="excl-list-head">
         <span style="flex:1;font-size:11px;letter-spacing:.1em;color:var(--text-dim)">MAP</span>
         <span style="font-size:11px;color:var(--text-dim);letter-spacing:.06em">RANK</span>
         <span style="font-size:11px;color:var(--text-dim);letter-spacing:.06em;margin-left:8px">DIFF</span>
       </div>
-      <!-- Finished maps -->
       <div class="excl-scroll" id="${colId}-fin">${finContent}</div>
-      <!-- Unfinished toggle -->
       <div class="excl-unfin-btn" id="btn-${colId}" onclick="toggleUnfinished('${colId}')"
         onmouseover="this.style.background='rgba(244,63,94,.08)'" onmouseout="this.style.background=''">
         <span style="color:var(--red);font-size:11px">✗</span>
@@ -2028,6 +1911,7 @@ function toggleUnfinished(colId){
   if(btn){ btn.style.borderTopColor = showing ? 'var(--border)' : 'rgba(244,63,94,.4)'; }
   if(arrow){ arrow.textContent = showing ? '▼' : '▲'; }
 }
+
 function buildNeitherPanel(neither){
   function mapRow(m, i){
     const dc = diffClass(m.difficulty);
@@ -2097,34 +1981,35 @@ function copyNeitherList(){
   }).catch(()=>{ prompt('Copy this list:', text); });
 }
 
-
-
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-let _activeDiff = 'all'; // 'all' | '1'..'7'
+let _activeDiff = 'all';
 let _activeTab  = 'overview';
-let _sortRank = { 1: false, 2: false }; // per-card sort state
-let _sortCommon = false; // sort common maps by best rank
+let _sortRank = { 1: false, 2: false };
+let _sortCommon = false;
 
-function updateTabIndicator(){ /* no-op — using border-bottom approach */ }
+function updateTabIndicator(){ /* no-op */ }
 
 function setTab(tab){
   _activeTab = tab;
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-'+tab));
-  // Scroll the active player tab into view if needed
   const activeBtn = document.querySelector(`.player-tab-btn[data-tab="${tab}"]`);
   if(activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
 }
 
-// Card shine on hover
+/* ✅ FIX 4: mousemove throttled via requestAnimationFrame — was firing hundreds of times/sec */
+let _mouseFrame = null;
 document.addEventListener('mousemove', e => {
-  const card = e.target.closest?.('.player-card');
-  if(!card) return;
-  const r = card.getBoundingClientRect();
-  const x = ((e.clientX - r.left) / r.width  * 100).toFixed(1) + '%';
-  const y = ((e.clientY - r.top)  / r.height * 100).toFixed(1) + '%';
-  card.style.setProperty('--shine-x', x);
-  card.style.setProperty('--shine-y', y);
+  if(_mouseFrame) return;
+  _mouseFrame = requestAnimationFrame(() => {
+    const card = e.target.closest?.('.player-card');
+    if(card){
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--shine-x', ((e.clientX - r.left) / r.width  * 100).toFixed(1) + '%');
+      card.style.setProperty('--shine-y', ((e.clientY - r.top)  / r.height * 100).toFixed(1) + '%');
+    }
+    _mouseFrame = null;
+  });
 });
 
 function setDiffFilter(diff){
@@ -2167,7 +2052,6 @@ function renderAll({ playerData, common, exclusives, neitherMaps }){
   try {
   const maxMaps = Math.max(...playerData.map(d => d.maps.length), 1);
 
-  // Overview: all player cards in grid
   const overviewGrid = document.getElementById('overviewGrid');
   overviewGrid.innerHTML = '';
   playerData.forEach((d, i) => {
@@ -2179,11 +2063,9 @@ function renderAll({ playerData, common, exclusives, neitherMaps }){
     overviewGrid.appendChild(card);
   });
 
-  // Chart
   const filteredForChart = playerData.map(d => ({ ...d, maps: filterMaps(d.maps) }));
   document.getElementById('chartPanel').innerHTML = buildChart(filteredForChart, playerData);
 
-  // Per-player full tabs
   playerData.forEach((d, i) => {
     const el = document.getElementById(`card-tab-${i}`);
     if(el){
@@ -2192,7 +2074,6 @@ function renderAll({ playerData, common, exclusives, neitherMaps }){
     }
   });
 
-  // Tab badge: map counts
   const tabCounts = {
     common: filterMaps(common).length,
     exclusive: exclusives.reduce((s, ex) => s + filterMaps(ex).length, 0),
@@ -2210,19 +2091,16 @@ function renderAll({ playerData, common, exclusives, neitherMaps }){
     }
   });
 
-  // Comparison panels
   document.getElementById('commonPanel').innerHTML  = buildCommonPanel(filterMaps(common), playerData);
   document.getElementById('diffPanel').innerHTML    = buildDiffPanel(playerData, exclusives.map(ex => filterMaps(ex)));
   document.getElementById('neitherPanel').innerHTML = buildNeitherPanel(filterMaps(neitherMaps));
 
-  // Filter count
   const totalAll = playerData.reduce((s, d) => s + d.maps.length, 0);
   const totalVis = playerData.reduce((s, d) => s + filterMaps(d.maps).length, 0);
   document.getElementById('filterCount').innerHTML = _activeDiff === 'all'
     ? `<strong>${totalAll}</strong> maps`
     : `<strong>${totalVis}</strong> / ${totalAll}`;
 
-  // Animations
   requestAnimationFrame(() => {
     document.querySelectorAll('.stat-val[data-target]').forEach(el => {
       const target = parseInt(el.dataset.target);
@@ -2257,18 +2135,12 @@ function renderAll({ playerData, common, exclusives, neitherMaps }){
   }
 }
 
-
-/* ═══════════════════════════════════════════════════════
-   rebuildTabs: inject per-player tabs into the tab bar + pane container
-═══════════════════════════════════════════════════════ */
 function rebuildTabs(playerData){
   const playersBar = document.getElementById('tabBarPlayers');
   const container  = document.getElementById('playerTabsContainer');
 
-  // Clear previous player tab buttons
   playersBar.innerHTML = '';
 
-  // Build one button per player in the players row
   playerData.forEach((d, i) => {
     const btn = document.createElement('button');
     btn.className = 'tab-btn player-tab-btn';
@@ -2280,7 +2152,6 @@ function rebuildTabs(playerData){
     playersBar.appendChild(btn);
   });
 
-  // Rebuild player pane containers
   container.innerHTML = '';
   playerData.forEach((d, i) => {
     const pane = document.createElement('div');
@@ -2290,7 +2161,6 @@ function rebuildTabs(playerData){
     container.appendChild(pane);
   });
 }
-
 
 window._rawHtmls = [];
 let _debugActivePlayer = 1;
@@ -2307,7 +2177,6 @@ function showRaw(idx){
   const html = window._rawHtmls[idx-1] || '';
   document.getElementById('rawHtmlBox').value = html.slice(0, 6000) + (html.length > 6000 ? '\n\n… (truncated)' : '');
 
-  // Parse and show structure stats
   if(html){
     const p = new DOMParser();
     const d = p.parseFromString(html, 'text/html');
@@ -2363,9 +2232,7 @@ async function scanBundles(){
     box.value += `\nFetching ${url.split('/').pop()}…`;
     try {
       const src = await fetchViaProxy(url, 12000);
-      // Find all fetch() calls
       const fetches = [...src.matchAll(/fetch\s*\(\s*[`"'](\/[^`"']+)[`"']/g)].map(m=>m[1]);
-      // Find string literals that look like API paths
       const apiPaths = [...src.matchAll(/"(\/api\/[a-zA-Z0-9_\-\/\[\]{}$]+)"/g)].map(m=>m[1]);
       const tmplPaths = [...src.matchAll(/`(\/api\/[^`]+)`/g)].map(m=>m[1]);
       const combined = [...new Set([...fetches, ...apiPaths, ...tmplPaths])];
@@ -2394,9 +2261,6 @@ function updateDebugCounts(d1, d2){
   if(el) el.textContent = [d1, d2].map(d => `${d.maps.length} maps for "${d.name}"`).join(', ');
 }
 
-/* ═══════════════════════════════════════════════════════
-   JSON Download (multi-player)
-═══════════════════════════════════════════════════════ */
 function downloadJSON(){
   if(!window._lastResult){ showStatus('No data to export.', true); return; }
   const { playerData, common, exclusives, neitherMaps } = window._lastResult;
@@ -2417,7 +2281,6 @@ function downloadJSON(){
   URL.revokeObjectURL(url);
 }
 
-
 /* ═══════════════════════════════════════════════════════
    Multi-player tag input
 ═══════════════════════════════════════════════════════ */
@@ -2425,14 +2288,12 @@ const PLAYER_COLORS = [
   '#f59e0b','#22d3ee','#a78bfa','#22c55e',
   '#f87171','#fb923c','#e879f9','#2dd4bf'
 ];
-let _tagPlayers = []; // [{name, color}]
+let _tagPlayers = [];
 
 function renderTags(){
   const box = document.getElementById('tagBox');
   const field = document.getElementById('tagField');
-  // Remove existing tags
   box.querySelectorAll('.player-tag').forEach(t => t.remove());
-  // Re-insert before the input field
   _tagPlayers.forEach((p, i) => {
     const tag = document.createElement('div');
     tag.className = 'player-tag';
@@ -2440,12 +2301,10 @@ function renderTags(){
     tag.innerHTML = `${esc(p.name)} <button class="tag-x" onclick="removeTag(${i})" title="Remove">✕</button>`;
     box.insertBefore(tag, field);
   });
-  // Update count badge
   const cnt = document.getElementById('tagCount');
   const n = _tagPlayers.length;
   cnt.textContent = `${n} / 8`;
   cnt.className = 'tag-count' + (n >= 2 ? ' ok' : ' warn');
-  // Disable input at max
   field.disabled = n >= 8;
   field.placeholder = n >= 8 ? 'Max 8 players' : (n === 0 ? 'e.g. yps, RavenXXX, champloo…' : 'Add another player…');
 }
@@ -2462,12 +2321,10 @@ function addTag(name){
 
 function removeTag(i){
   _tagPlayers.splice(i, 1);
-  // Recolor remaining
   _tagPlayers.forEach((p, j) => { p.color = PLAYER_COLORS[j % PLAYER_COLORS.length]; });
   renderTags();
 }
 
-// Wire up tag input field
 document.getElementById('tagField').addEventListener('keydown', e => {
   const field = e.target;
   if(e.key === 'Enter'){
@@ -2487,7 +2344,6 @@ document.getElementById('tagField').addEventListener('keydown', e => {
   }
 });
 document.getElementById('tagField').addEventListener('input', e => {
-  // Auto-commit on comma in input value
   if(e.target.value.includes(',')){
     const parts = e.target.value.split(',');
     parts.slice(0, -1).forEach(p => { if(p.trim()) addTag(p.trim()); });
@@ -2497,10 +2353,9 @@ document.getElementById('tagField').addEventListener('input', e => {
 renderTags();
 
 /* ═══════════════════════════════════════════════════════
-   Main Compare Flow (multi-player)
+   Main Compare Flow
 ═══════════════════════════════════════════════════════ */
 async function startCompare(){
-  // Commit any pending text in the field
   const field = document.getElementById('tagField');
   const pending = field.value.replace(/,/g,'').trim();
   if(pending){ addTag(pending); field.value = ''; }
@@ -2522,9 +2377,11 @@ async function startCompare(){
 
   try {
     showStatus(`Fetching data for ${_tagPlayers.length} players…`);
-    const settled = await Promise.allSettled(
-      _tagPlayers.map(p => fetchPlayerAPI(p.name, () => {}))
-    );
+    // ✅ fetch diff totals IN PARALLEL with player data — not after
+    const [settled] = await Promise.all([
+      Promise.allSettled(_tagPlayers.map(p => fetchPlayerAPI(p.name, () => {}))),
+      loadDiffTotals(),
+    ]);
 
     window._rawHtmls = settled.map(s => s.status === 'fulfilled' ? (s.value.json ? JSON.stringify(s.value.json,null,2) : (s.value.html||'')) : '');
 
@@ -2551,17 +2408,14 @@ async function startCompare(){
 
     hideStatus();
 
-    // Common: maps ALL players have finished
     const allSets = playerData.map(d => new Set(d.maps.map(m => m.name.toLowerCase())));
     const commonNameSet = new Set([...allSets[0]].filter(n => allSets.every(s => s.has(n))));
     const common = playerData[0].maps.filter(m => commonNameSet.has(m.name.toLowerCase()));
 
-    // Exclusive per player: maps only THIS player has
     const exclusives = playerData.map((d, i) =>
       d.maps.filter(m => allSets.every((s, j) => j === i || !s.has(m.name.toLowerCase())))
     );
 
-    // Neither: intersection of ALL players' unfinished lists
     const unfinSets = playerData.map(d =>
       new Set(d.unfinishedArr.map(item => String(item.map||item.mapName||item.name||'').trim().toLowerCase()).filter(Boolean))
     );
@@ -2583,7 +2437,6 @@ async function startCompare(){
     rebuildTabs(playerData);
     renderAll(result);
     showResults(true);
-    loadDiffTotals();
     savePlayersToURL(playerData);
 
     const zeroMaps = playerData.filter(d => d.maps.length === 0);
@@ -2600,12 +2453,8 @@ async function startCompare(){
   }
 }
 
-/* ═══════════════════════════════════════════════════════
-   Initial translation pass
-═══════════════════════════════════════════════════════ */
 setLang('en');
 
-// Save players to URL after compare
 function savePlayersToURL(playerData){
   const names = playerData.map(d => d.name).join(',');
   const url = new URL(location.href);
@@ -2613,7 +2462,6 @@ function savePlayersToURL(playerData){
   history.replaceState(null, '', url.toString());
 }
 
-// Load players from URL on page load
 (function loadPlayersFromURL(){
   const url = new URL(location.href);
   const p = url.searchParams.get('players');
@@ -2627,36 +2475,37 @@ function savePlayersToURL(playerData){
 /* ═══════════════════════════════════════════════════════
    Difficulty stats popup
 ═══════════════════════════════════════════════════════ */
-// Pre-compute per-difficulty totals from /api/maps/list (fetched once)
-window._diffTotals = {}; // { diffNum: totalOnSite }
+window._diffTotals = {};
 window._diffTotalsLoaded = false;
+window._diffTotalsPromise = null;
 
 async function loadDiffTotals(){
   if(window._diffTotalsLoaded) return;
-  try {
-    const text = await fetchViaProxy('https://www.ravenkog.com/api/maps/list', 14000);
-    const json = JSON.parse(text);
-    const arr = Array.isArray(json) ? json : (json.data || json.maps || json.results || []);
-    const counts = {};
-    arr.forEach(item => {
-      const d = diffStrToNum(String(item.difficulty || item.diff || ''));
-      if(d > 0) counts[d] = (counts[d]||0) + 1;
-    });
-    window._diffTotals = counts;
-    window._diffTotalsLoaded = true;
-    // Re-render so completion rings update from "…" to actual %
-    if(window._lastResult) renderAll(window._lastResult);
-  } catch(_){ /* non-fatal */ }
+  // if already in-flight, wait for the same promise
+  if(window._diffTotalsPromise) return window._diffTotalsPromise;
+  window._diffTotalsPromise = (async () => {
+    try {
+      const text = await fetchViaProxy('https://www.ravenkog.com/api/maps/list', 14000);
+      const json = JSON.parse(text);
+      const arr = Array.isArray(json) ? json : (json.data || json.maps || json.results || []);
+      const counts = {};
+      arr.forEach(item => {
+        const d = diffStrToNum(String(item.difficulty || item.diff || ''));
+        if(d > 0) counts[d] = (counts[d]||0) + 1;
+      });
+      window._diffTotals = counts;
+      window._diffTotalsLoaded = true;
+    } catch(_){ /* non-fatal */ }
+  })();
+  return window._diffTotalsPromise;
 }
 
 function showDiffPopup(diffNum, diffLabel, playerName){
-  // Remove any existing popup
   const old = document.getElementById('diffPopupOverlay');
   if(old) old.remove();
 
   const total = window._diffTotals[diffNum] || null;
 
-  // Count how many maps this player completed in this diff
   let playerCount = 0;
   if(window._lastResult){
     const d = (window._lastResult?.playerData || []).find(p => p.name === playerName)
@@ -2691,7 +2540,6 @@ function showDiffPopup(diffNum, diffLabel, playerName){
   `;
   document.body.appendChild(overlay);
 
-  // Animate bar after insertion
   if(pct !== null){
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -2701,7 +2549,6 @@ function showDiffPopup(diffNum, diffLabel, playerName){
     });
   }
 
-  // If totals not loaded, fetch then refresh popup
   if(!window._diffTotalsLoaded){
     loadDiffTotals().then(() => {
       overlay.remove();
