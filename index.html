@@ -821,6 +821,54 @@
   footer { text-align: center; padding: 40px 0 20px; color: var(--muted); font-size: 13px; letter-spacing: .1em; }
   footer a { color: var(--amber-dim); text-decoration: none; transition: color .2s; }
   footer a:hover { color: var(--amber); }
+
+  /* ─── Points Progression ─────────────────────────────────── */
+  .pts-panel {
+    background: var(--panel); border: 1px solid var(--border2);
+    border-top: 2px solid rgba(253,224,71,.4);
+    overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  }
+  .pts-panel-header {
+    padding: 14px 20px;
+    background: linear-gradient(90deg, var(--panel2), var(--panel));
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-head); font-size: 14px; letter-spacing: .14em;
+    color: var(--text); display: flex; align-items: center; gap: 10px;
+    text-transform: uppercase;
+  }
+  .pts-chart-wrap {
+    padding: 20px 24px 16px;
+    overflow-x: auto;
+  }
+  .pts-svg { overflow: visible; width: 100%; }
+  .pts-axis-label { font-family: var(--font-mono); font-size: 11px; fill: var(--text-dim); }
+  .pts-legend {
+    display: flex; gap: 18px; padding: 10px 24px 14px;
+    border-top: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .pts-legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-dim);
+  }
+  .pts-legend-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .pts-total-row {
+    display: flex; gap: 0; border-top: 1px solid var(--border);
+  }
+  .pts-total-cell {
+    flex: 1; padding: 10px 16px; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .pts-total-cell:last-child { border-right: none; }
+  .pts-total-val {
+    font-family: var(--font-head); font-size: 22px; font-weight: 800;
+    line-height: 1; letter-spacing: -.02em;
+  }
+  .pts-total-lbl {
+    font-size: 9px; color: var(--text-dim); letter-spacing: .14em;
+    text-transform: uppercase; margin-top: 6px;
+  }
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
 </head>
@@ -901,7 +949,27 @@
     <!-- Tab panes (player panes injected dynamically) -->
     <div class="tab-pane active" id="tab-overview">
       <div class="players-grid" id="overviewGrid"></div>
-      <div class="chart-panel" id="chartPanel"></div>
+      <!-- Overview page switcher -->
+      <div style="display:flex;align-items:center;gap:0;margin-top:14px;border-bottom:1px solid var(--border)">
+        <button class="ov-page-btn active" id="ovPage1Btn" onclick="setOverviewPage(1)"
+          style="background:transparent;border:none;border-bottom:2px solid var(--amber);
+                 color:var(--amber);font-family:var(--font-head);font-size:12px;
+                 letter-spacing:.12em;padding:8px 18px;cursor:pointer;transition:all .2s">
+          STATS
+        </button>
+        <button class="ov-page-btn" id="ovPage2Btn" onclick="setOverviewPage(2)"
+          style="background:transparent;border:none;border-bottom:2px solid transparent;
+                 color:var(--text-dim);font-family:var(--font-head);font-size:12px;
+                 letter-spacing:.12em;padding:8px 18px;cursor:pointer;transition:all .2s">
+          ★ POINTS
+        </button>
+      </div>
+      <div id="ovPage1" style="margin-top:0">
+        <div class="chart-panel" id="chartPanel"></div>
+      </div>
+      <div id="ovPage2" style="display:none;margin-top:14px">
+        <div id="pointsPanel"></div>
+      </div>
     </div>
     <div id="playerTabsContainer"></div>
 
@@ -1199,18 +1267,32 @@ async function fetchAllPages(buildURL, name, statusLabel, statusCb){
   return { arr: allItems, total: pageTotal || allItems.length };
 }
 
+function buildPlayerStatsURL(name){
+  return `https://www.ravenkog.com/api/player-stats?playerName=${encodeURIComponent(name)}`;
+}
+
+async function fetchPlayerStats(name){
+  try {
+    const text = await fetchViaProxy(buildPlayerStatsURL(name), 12000);
+    const json = JSON.parse(text);
+    return json;
+  } catch(_){ return null; }
+}
+
 async function fetchPlayerAPI(name, statusCb){
   const tried = [];
   statusCb(`📡 Fetching maps for "${name}"…`);
 
-  const [finResult, unfinResult] = await Promise.allSettled([
+  const [finResult, unfinResult, statsResult] = await Promise.allSettled([
     fetchAllPages(buildFinishedURL, name, 'finished maps', statusCb),
     fetchAllPages(buildUnfinishedURL, name, 'unfinished maps', statusCb),
+    fetchPlayerStats(name),
   ]);
 
   const finishedArr   = finResult.status   === 'fulfilled' ? finResult.value.arr   : [];
   const finishedTotal = finResult.status   === 'fulfilled' ? finResult.value.total : 0;
   const unfinishedArr = unfinResult.status === 'fulfilled' ? unfinResult.value.arr : [];
+  const playerStats   = statsResult.status === 'fulfilled' ? statsResult.value     : null;
 
   tried.push(buildFinishedURL(name, 0, 9999));
   tried.push(buildUnfinishedURL(name, 0, 9999));
@@ -1220,6 +1302,7 @@ async function fetchPlayerAPI(name, statusCb){
     return {
       json: { data: finishedArr, total: finishedTotal },
       unfinishedArr,
+      playerStats,
       url: buildFinishedURL(name),
       tried,
       raw: JSON.stringify({ finished: finishedArr.slice(0,3), unfinished: unfinishedArr.slice(0,3) }),
@@ -1265,7 +1348,8 @@ function parseAPIResponse(json, name){
     const diffStr = String(item.difficulty || item.diff || item.tier || item.category || '').trim();
     const diffNum = diffStrToNum(diffStr);
     const time = String(item.finishTime || item.finish_time || item.time || '').trim();
-    return { name: mapName, rank, difficulty: diffNum, difficultyLabel: diffStr, time };
+    const points = parseInt(item.points || item.stars || item.score || item.mapPoints || 0) || 0;
+    return { name: mapName, rank, difficulty: diffNum, difficultyLabel: diffStr, time, points };
   }).filter(Boolean);
 
   const rank1Count = maps.filter(m => m.rank === 1).length;
@@ -1565,6 +1649,19 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
     ? (rankedMaps.reduce((s, m) => s + m.rank, 0) / rankedMaps.length).toFixed(1)
     : null;
 
+  // Wasted time = total finish time of ALL finished maps (from base.maps with time)
+  const totalSecs = base.maps.reduce((s, m) => s + parseTimeToSecs(m.time), 0);
+  function fmtWastedTime(secs){
+    if(secs <= 0) return null;
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = Math.floor(secs % 60);
+    if(h > 0) return `${h}h ${m}m`;
+    if(m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  }
+  const wastedLabel = fmtWastedTime(totalSecs);
+
   const searchInputId = `mapSearch-${idx}`;
 
   return `
@@ -1574,6 +1671,7 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
         <div class="player-label">PLAYER ${idx < 10 ? '0'+idx : idx}</div>
         <div class="player-name">${esc(data.name)}</div>
         ${avgRank ? `<div class="player-avg-rank">avg rank <span style="color:${color}">#${avgRank}</span></div>` : ''}
+        ${wastedLabel ? `<div class="player-avg-rank" style="margin-top:2px"><span style="color:var(--text-dim);font-size:10px;letter-spacing:.04em" title="Total time spent finishing all maps">⏱ ${wastedLabel}</span></div>` : ''}
       </div>
       ${r1Pill}
       ${completionRing}
@@ -1604,15 +1702,23 @@ function buildPlayerCard(data, idx, rawData, fullHeight, maxMaps){
                font-family:var(--font-mono);font-size:11px;padding:3px 8px;
                outline:none;width:100px;transition:border-color .2s;flex-shrink:0"
         onfocus="this.style.borderColor='${color}'" onblur="this.style.borderColor='var(--border2)'"/>
-      <button onclick="sortByRank(${idx})" title="Sort by rank"
-        style="background:transparent;border:1px solid ${_sortRank[idx] ? color : 'var(--border2)'};
-               color:${_sortRank[idx] ? color : 'var(--text-dim)'};
+      <button onclick="sortByRank(${idx})" title="Cycle sort: rank↑ → rank↓ → time↑ → time↓ → off"
+        style="background:transparent;
+               border:1px solid ${(()=>{const m=_sortRank[idx]||'none';return m!=='none'?color:'var(--border2)'})()};
+               color:${(()=>{const m=_sortRank[idx]||'none';return m!=='none'?color:'var(--text-dim)'})()};
                font-family:var(--font-head);font-size:11px;letter-spacing:.08em;
                padding:2px 8px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;
-               ${_sortRank[idx] ? `box-shadow:0 0 8px ${color}44;` : ''}"
+               ${(()=>{const m=_sortRank[idx]||'none';return m!=='none'?`box-shadow:0 0 8px ${color}44;`:''})()}"
         onmouseover="this.style.borderColor='${color}';this.style.color='${color}'"
-        onmouseout="this.style.borderColor='${_sortRank[idx] ? color : 'var(--border2)'}';this.style.color='${_sortRank[idx] ? color : 'var(--text-dim)'}'">
-        ↑ RANK${_sortRank[idx] ? ' ✓' : ''}
+        onmouseout="this.style.borderColor='${(()=>{const m=_sortRank[idx]||'none';return m!=='none'?color:'var(--border2)'})()}';this.style.color='${(()=>{const m=_sortRank[idx]||'none';return m!=='none'?color:'var(--text-dim)'})()}'">
+        ${(()=>{
+          const m=_sortRank[idx]||'none';
+          if(m==='rank-asc')  return '↑ RANK ✓';
+          if(m==='rank-desc') return '↓ RANK ✓';
+          if(m==='time-asc')  return '↑ TIME ✓';
+          if(m==='time-desc') return '↓ TIME ✓';
+          return '⇅ SORT';
+        })()}
       </button>
     </div>
     <div class="maps-col-header">
@@ -2038,7 +2144,7 @@ function copyNeitherList(){
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 let _activeDiff = 'all';
 let _activeTab  = 'overview';
-let _sortRank = { 1: false, 2: false };
+let _sortRank = {}; // per player: 'none'|'rank-asc'|'rank-desc'|'time-asc'|'time-desc'
 let _sortCommon = false;
 let _sortNeither = 'desc'; // 'desc' = high→low points, 'asc' = low→high, 'none' = default
 
@@ -2085,19 +2191,199 @@ function sortCommonByRank(){
 }
 
 function sortByRank(pidx){
-  _sortRank[pidx] = !_sortRank[pidx];
+  const modes = ['rank-asc','rank-desc','time-asc','time-desc','none'];
+  const cur = _sortRank[pidx] || 'none';
+  _sortRank[pidx] = modes[(modes.indexOf(cur) + 1) % modes.length];
   if(window._lastResult) renderAll(window._lastResult);
 }
 
 function applySort(maps, pidx){
-  if(!_sortRank[pidx]) return maps;
-  return [...maps].sort((a,b) => {
-    if(a.rank === 0 && b.rank === 0) return 0;
-    if(a.rank === 0) return 1;
-    if(b.rank === 0) return -1;
-    return a.rank - b.rank;
-  });
+  const mode = _sortRank[pidx] || 'none';
+  if(mode === 'none') return maps;
+  const sorted = [...maps];
+  if(mode === 'rank-asc'){
+    sorted.sort((a,b) => {
+      if(a.rank===0 && b.rank===0) return 0;
+      if(a.rank===0) return 1; if(b.rank===0) return -1;
+      return a.rank - b.rank;
+    });
+  } else if(mode === 'rank-desc'){
+    sorted.sort((a,b) => {
+      if(a.rank===0 && b.rank===0) return 0;
+      if(a.rank===0) return 1; if(b.rank===0) return -1;
+      return b.rank - a.rank;
+    });
+  } else if(mode === 'time-asc'){
+    sorted.sort((a,b) => {
+      const ta = parseTimeToSecs(a.time), tb = parseTimeToSecs(b.time);
+      if(!ta && !tb) return 0; if(!ta) return 1; if(!tb) return -1;
+      return ta - tb;
+    });
+  } else if(mode === 'time-desc'){
+    sorted.sort((a,b) => {
+      const ta = parseTimeToSecs(a.time), tb = parseTimeToSecs(b.time);
+      if(!ta && !tb) return 0; if(!ta) return 1; if(!tb) return -1;
+      return tb - ta;
+    });
+  }
+  return sorted;
 }
+
+let _overviewPage = 1;
+function setOverviewPage(page){
+  _overviewPage = page;
+  document.getElementById('ovPage1').style.display = page === 1 ? 'block' : 'none';
+  document.getElementById('ovPage2').style.display = page === 2 ? 'block' : 'none';
+  const btn1 = document.getElementById('ovPage1Btn');
+  const btn2 = document.getElementById('ovPage2Btn');
+  if(btn1){ btn1.style.borderBottomColor = page===1 ? 'var(--amber)' : 'transparent'; btn1.style.color = page===1 ? 'var(--amber)' : 'var(--text-dim)'; }
+  if(btn2){ btn2.style.borderBottomColor = page===2 ? '#fde047' : 'transparent'; btn2.style.color = page===2 ? '#fde047' : 'var(--text-dim)'; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   Points Progression Panel
+═══════════════════════════════════════════════════════ */
+function buildPointsPanel(playerData){
+  function getCumulativePoints(d){
+    const mapsWithPts = (d.maps || []).filter(m => (m.points||0) > 0);
+    if(!mapsWithPts.length) return [];
+    const chrono = [...mapsWithPts].reverse();
+    let cum = 0;
+    return chrono.map((m, i) => {
+      cum += m.points;
+      return { i: i+1, pts: cum, map: m.name, single: m.points };
+    });
+  }
+
+  const series = playerData.map(d => ({
+    name: d.name,
+    color: d.color,
+    cumulative: getCumulativePoints(d),
+    totalPts: (d.maps||[]).reduce((s,m)=>s+(m.points||0), 0),
+  }));
+
+  const hasCumData = series.some(s => s.cumulative.length > 0);
+
+  if(!hasCumData){
+    return `<div class="pts-panel">
+      <div class="pts-panel-header">
+        <span class="badge" style="background:#fde047;color:#000">★</span>
+        POINTS PROGRESSION
+      </div>
+      <div class="empty-msg" style="padding:40px">— No points data — (maps API may not return point values) —</div>
+    </div>`;
+  }
+
+  const maxX = Math.max(...series.map(s => s.cumulative.length), 1);
+  const maxY = Math.max(...series.map(s => s.cumulative.length ? s.cumulative[s.cumulative.length-1].pts : 0), 1);
+
+  // Nice Y-axis ceiling: round up to nearest nice number
+  function niceMax(v){
+    const mag = Math.pow(10, Math.floor(Math.log10(v)));
+    const norm = v / mag;
+    const steps = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10];
+    const nice = steps.find(s => s >= norm) || 10;
+    return nice * mag;
+  }
+  const yMax = niceMax(maxY);
+
+  // SVG dimensions — large viewBox, responsive via CSS width:100%
+  const W = 1100, H = 320;
+  const PAD = { t: 20, r: 90, b: 44, l: 64 };
+  const chartW = W - PAD.l - PAD.r;
+  const chartH = H - PAD.t - PAD.b;
+
+  function px(i){ return PAD.l + (i / maxX) * chartW; }
+  function py(v){ return PAD.t + chartH - (v / yMax) * chartH; }
+
+  function fmtPts(v){
+    if(v >= 1000000) return (v/1000000).toFixed(1) + 'M';
+    if(v >= 1000) return (v/1000).toFixed(v >= 10000 ? 0 : 1) + 'k';
+    return String(v);
+  }
+
+  // Grid + Y axis
+  const yTicks = 5;
+  let grid = '', yLabels = '';
+  for(let t = 0; t <= yTicks; t++){
+    const v = Math.round((yMax / yTicks) * t);
+    const y = py(v);
+    grid   += `<line x1="${PAD.l}" y1="${y.toFixed(1)}" x2="${PAD.l+chartW}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.05)" stroke-width="1"/>`;
+    yLabels += `<text x="${PAD.l-8}" y="${y.toFixed(1)}" dominant-baseline="middle" text-anchor="end" class="pts-axis-label">${fmtPts(v)}</text>`;
+  }
+
+  // X axis ticks (6 evenly spaced)
+  let xLabels = '';
+  const xSteps = Math.min(6, maxX);
+  for(let t = 0; t <= xSteps; t++){
+    const i = Math.round((maxX / xSteps) * t);
+    xLabels += `<text x="${px(i).toFixed(1)}" y="${PAD.t+chartH+18}" text-anchor="middle" class="pts-axis-label">${i}</text>`;
+  }
+
+  // Chart border
+  let svgBody = `<rect x="${PAD.l}" y="${PAD.t}" width="${chartW}" height="${chartH}" fill="rgba(0,0,0,.2)" rx="2"/>`;
+  svgBody += grid;
+  svgBody += `<line x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${PAD.t+chartH}" stroke="rgba(255,255,255,.1)" stroke-width="1"/>`;
+  svgBody += `<line x1="${PAD.l}" y1="${PAD.t+chartH}" x2="${PAD.l+chartW}" y2="${PAD.t+chartH}" stroke="rgba(255,255,255,.1)" stroke-width="1"/>`;
+  svgBody += yLabels + xLabels;
+  svgBody += `<text x="${PAD.l + chartW/2}" y="${H - 4}" text-anchor="middle" class="pts-axis-label" style="font-size:10px">maps completed (chronological order)</text>`;
+
+  // Lines per player
+  series.forEach(s => {
+    if(!s.cumulative.length) return;
+    const last = s.cumulative[s.cumulative.length - 1];
+
+    // Area
+    const areaD = `M${px(0).toFixed(1)},${py(0).toFixed(1)} `
+      + s.cumulative.map(p => `L${px(p.i).toFixed(1)},${py(p.pts).toFixed(1)}`).join(' ')
+      + ` L${px(last.i).toFixed(1)},${py(0).toFixed(1)} Z`;
+    svgBody += `<path d="${areaD}" fill="${s.color}" fill-opacity="0.08"/>`;
+
+    // Line
+    const lineD = `M${px(s.cumulative[0].i).toFixed(1)},${py(s.cumulative[0].pts).toFixed(1)} `
+      + s.cumulative.slice(1).map(p => `L${px(p.i).toFixed(1)},${py(p.pts).toFixed(1)}`).join(' ');
+    svgBody += `<path d="${lineD}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 5px ${s.color}99)"/>`;
+
+    // End dot
+    const ex = px(last.i), ey = py(last.pts);
+    svgBody += `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="5" fill="${s.color}" stroke="var(--bg)" stroke-width="2" style="filter:drop-shadow(0 0 8px ${s.color})"/>`;
+
+    // Right-side label (inside right padding)
+    const labelY = Math.max(PAD.t + 8, Math.min(PAD.t + chartH - 4, ey));
+    svgBody += `<text x="${PAD.l + chartW + 8}" y="${labelY.toFixed(1)}" dominant-baseline="middle"
+      style="font-family:var(--font-head);font-size:11px;fill:${s.color};font-weight:700">${fmtPts(last.pts)}</text>`;
+  });
+
+  const svgHtml = `<svg class="pts-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"
+    style="width:100%;height:auto;min-height:180px;max-height:340px;display:block">${svgBody}</svg>`;
+
+  // Totals row
+  const totalsHtml = series.map(s => `
+    <div class="pts-total-cell">
+      <div class="pts-total-val" style="color:${s.color};text-shadow:0 0 20px ${s.color}66">${s.totalPts.toLocaleString()}</div>
+      <div style="font-size:9px;color:${s.color};font-family:var(--font-head);letter-spacing:.08em;opacity:.8;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}</div>
+      <div class="pts-total-lbl">TOTAL PTS</div>
+    </div>`).join('');
+
+  // Legend
+  const legendHtml = series.map(s => `
+    <div class="pts-legend-item">
+      <div class="pts-legend-dot" style="background:${s.color};box-shadow:0 0 6px ${s.color}"></div>
+      <span style="color:${s.color};font-family:var(--font-head);font-size:11px;font-weight:700">${esc(s.name)}</span>
+      <span style="color:var(--text-dim);font-size:11px">${s.cumulative.length} maps · ${s.totalPts.toLocaleString()} pts</span>
+    </div>`).join('');
+
+  return `<div class="pts-panel">
+    <div class="pts-panel-header">
+      <span class="badge" style="background:#fde047;color:#000">★</span>
+      POINTS PROGRESSION
+      <span style="font-size:11px;color:var(--text-dim);margin-left:4px">— cumulative points as maps completed</span>
+    </div>
+    <div class="pts-total-row">${totalsHtml}</div>
+    <div class="pts-chart-wrap" style="padding:16px 20px 12px">${svgHtml}</div>
+    <div class="pts-legend">${legendHtml}</div>
+  </div>`;}
+
 
 /* ═══════════════════════════════════════════════════════
    Render All
@@ -2119,6 +2405,7 @@ function renderAll({ playerData, common, exclusives, neitherMaps }){
 
   const filteredForChart = playerData.map(d => ({ ...d, maps: filterMaps(d.maps) }));
   document.getElementById('chartPanel').innerHTML = buildChart(filteredForChart, playerData);
+  document.getElementById('pointsPanel').innerHTML = buildPointsPanel(playerData);
 
   playerData.forEach((d, i) => {
     const el = document.getElementById(`card-tab-${i}`);
@@ -2424,7 +2711,7 @@ async function startCompare(){
   _sortRank = {};
   _sortCommon = false;
   _sortNeither = 'desc';
-  _tagPlayers.forEach((_, i) => { _sortRank[i+1] = false; });
+  _tagPlayers.forEach((_, i) => { _sortRank[i+1] = 'none'; });
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.diff==='all'));
   showLoader(true);
   document.getElementById('compareBtn').disabled = true;
@@ -2450,6 +2737,7 @@ async function startCompare(){
         const d = r.json ? parseAPIResponse(r.json, name) : parsePlayerHTML(r.html || '', name);
         d.color = _tagPlayers[i].color;
         d.unfinishedArr = r.unfinishedArr || [];
+        d.playerStats   = r.playerStats   || null;
         playerData.push(d);
       } catch(e){
         failed.push(name + (e.message === '404' ? ' (not found)' : ''));
